@@ -1,0 +1,341 @@
+---
+title: "Normalization and batch correction of the datasets"
+author: "Esther Tercero Atencia"
+date: "2023-04-25"
+output: pdf_document
+---
+In this document we will normalize (vsn) and correct batch effects of the MYELOMA MULTIPLE and SIMULATED count matrices. The code for filter the HEPATOCELLULAR dataset is also included, but muted because it is not the main of the work.
+
+Here also we will split the datasets following the division of the reference dataset or with a randomize approach.
+
+Normalization + batch removal is muted because next steps (DiffExpression Analyses) have an step of batch correction in the pipeline of analyses, but the code is shared here in case it is of interest.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(tidyverse)
+library(edgeR)
+library(DESeq2)
+library(tidymodels)
+library(here)
+source(here("utils/functions.R"))
+```
+
+### Metadata and filtered counts loading
+```{r}
+## metadata
+metadata_all <- read.csv("../data/metadata/all_metadata_prep.csv") %>%
+  apply(.,2,as.character) %>%
+  as.data.frame()
+```
+
+
+### Filtered counts loading and discovery/validation split
+```{r}
+#------- MM
+## Sample division for Myeloma multiple is performed as reported in the reference
+## publication (Roskams-Hieter et al.). 
+
+# metadata discovery
+metadata_mm_discovery <- metadata_all %>%
+  filter(outcome == "HD" | outcome == "MM") %>%
+  filter(grepl("PP",sample)) %>%
+  mutate(outcome = as.factor(outcome), 
+         age = as.numeric(age), 
+         gender = as.factor(gender),
+         RNA_extraction = as.factor(RNA_extraction),
+         Library_preparation = as.factor(Library_preparation), 
+         set = as.factor(set), 
+         race = as.factor(race),
+         group = as.factor(group),
+         age_fact = as.factor(cut(age, breaks=4))) 
+write_csv(metadata_mm_discovery, file = here("data/metadata/metadata_mm_discovery.csv"))
+
+# metadata_validation
+metadata_mm_validation <- metadata_all %>%
+  filter(outcome == "HD" | outcome == "MM") %>%
+  filter(grepl("RSQ",sample)) %>%
+  mutate(outcome = as.factor(outcome), 
+         age = as.numeric(age), 
+         gender = as.factor(gender),
+         RNA_extraction = as.factor(RNA_extraction),
+         Library_preparation = as.factor(Library_preparation), 
+         set = as.factor(set), 
+         race = as.factor(race),
+         group = as.factor(group),
+         age_fact = as.factor(cut(age, breaks=4))) 
+write_csv(metadata_mm_validation, file = here("data/metadata/metadata_mm_validation.csv"))
+
+# filtered counts
+filtered_counts_mm <- read.csv(here("data/filtered_data/filtered_dedupCounts_mm.csv")) %>% 
+  column_to_rownames("GeneID")
+## discovery split
+filtered_counts_mm_discovery <- filtered_counts_mm %>%
+  select(grep("PP",colnames(filtered_counts_mm)))
+write_csv(filtered_counts_mm_discovery %>% rownames_to_column(var = "GeneID"), here("data/filtered_data/filtered_mm_discovery.csv"))
+## validation split
+filtered_counts_mm_validation <- filtered_counts_mm %>%
+  select(grep("RSQ",colnames(filtered_counts_mm)))
+write_csv(filtered_counts_mm_validation %>% rownames_to_column(var = "GeneID"), here("data/filtered_data/filtered_mm_validation.csv"))
+```
+
+```{r}
+#------- HC
+## Sample division for Hepatocellular cancer is considered awkwardly divided in the reference
+## publication (Roskam-Hieter et al.). [See Thesis theory]
+## Resampling is needed here to get a balance and proper discovery/validation division
+# set.seed(20)
+# filtered_counts_hc <- read.csv(here("data/filtered_data/filtered_dedupCounts_hc.csv")) %>% 
+#   column_to_rownames("GeneID")
+# 
+# hcc_data <- cbind(outcome = metadata_all 
+#                   %>% filter(outcome == "HD" | outcome == "HC") 
+#                   %>% dplyr::select(outcome),
+#                   filtered_counts_hc 
+#                   %>% t() 
+#                   %>% data.frame())
+# 
+# hcc_split <- rsample::initial_split(hcc_data,            # Data to split
+#                                      prop = 0.8,         # Proportion of data for training set
+#                                      strata = outcome)   # Stratification variable
+# filtered_counts_hc_discovery <- training(hcc_split) %>% 
+#   rownames_to_column(var = "SampleID") %>%
+#   dplyr::select(-outcome)
+# write_csv(filtered_counts_hc_discovery, here("data/filtered_data/filtered_hc_discovery.csv"))
+# 
+# filtered_counts_hc_validation <- testing(hcc_split) %>%
+#   rownames_to_column(var = "SampleID") %>%
+#   dplyr::select(-outcome)
+# write_csv(filtered_counts_hc_validation, here("data/filtered_data/filtered_hc_validation.csv"))
+# 
+# metadata_hc_discovery <- metadata_all %>% 
+#   filter(metadata_all$sample %in% filtered_counts_hc_discovery$SampleID) %>% 
+#   mutate(outcome = as.factor(outcome), 
+#          age = as.numeric(age),
+#          gender = as.factor(gender),
+#          RNA_extraction = as.factor(RNA_extraction),
+#          Library_preparation = as.factor(Library_preparation),
+#          set = as.factor(set),
+#          race = as.factor(race),
+#          group = as.factor(group),
+#          age_fact = as.factor(cut(age, breaks=4))) 
+# write_csv(metadata_hc_discovery, here("data/metadata/metadata_hc_discovery.csv"))
+# 
+# metadata_hc_validation <- metadata_all %>% 
+#   filter(metadata_all$sample %in% filtered_counts_hc_validation$SampleID) %>%
+#   mutate(outcome = as.factor(outcome), 
+#          age = as.numeric(age),
+#          gender = as.factor(gender),
+#          RNA_extraction = as.factor(RNA_extraction),
+#          Library_preparation = as.factor(Library_preparation),
+#          set = as.factor(set),
+#          race = as.factor(race),
+#          group = as.factor(group),
+#          age_fact = as.factor(cut(age, breaks=4))) 
+# write_csv(metadata_hc_validation, here("data/metadata/metadata_hc_validation.csv"))
+```
+
+```{r}
+#------- Simulated data
+# filtered counts
+sims_filtered <- read.csv(here("data/filtered_data/filtered_dedupCounts_sim_rep.csv")) %>% 
+  column_to_rownames(var = "GeneID") %>% 
+  t() %>% 
+  data.frame() %>% 
+  rownames_to_column(var = "SampleID")
+
+# metadata s
+metadata_sims <- utils::read.csv(here("data/simulated_data/metadata_rep")) %>% 
+  mutate(SampleID = GeneID, .keep = "unused")
+
+all_set <- merge(metadata_sims, sims_filtered, by = "SampleID") %>% 
+  column_to_rownames(var = "SampleID") 
+cell_split <- initial_split(all_set,  
+                            strata = group)
+
+sim_discovery <- training(cell_split)
+sim_validation  <- testing(cell_split)
+
+metadata_discovery <- cbind(rownames(sim_discovery), sim_discovery$group) %>% 
+  data.frame()
+colnames(metadata_discovery) <- c("sampleID", "outcome")
+
+metadata_validation <- cbind(rownames(sim_validation), sim_validation$group)  %>% 
+  data.frame()
+colnames(metadata_validation) <- c("sampleID", "outcome")
+
+sim_discovery <- sim_discovery %>% 
+  dplyr::select(-group) %>% 
+  t() %>% 
+  data.frame()
+write_csv(sim_discovery %>% rownames_to_column(var = "GeneID"), here("data/filtered_data/filtered_sim_rep_discovery.csv"))
+
+sim_validation <- sim_validation %>% 
+  dplyr::select(-group) %>% 
+  t() %>% 
+  data.frame()
+write_csv(sim_validation %>% rownames_to_column(var = "GeneID"), here("data/filtered_data/filtered_sim_rep_validation.csv"))
+```
+
+
+
+### Normalized and batch-corrected count matrix aplplying VSN normalization
+```{r}
+#------- MM
+## discovery test
+norm.factors <- DGEList(counts = filtered_counts_mm_discovery, samples = metadata_mm_discovery, group = metadata_mm_discovery$outcome)
+norm.factors <- calcNormFactors(norm.factors, method = "TMM")
+
+group <- metadata_mm_discovery$group
+age <- metadata_mm_discovery$age
+age_fact <- metadata_mm_discovery$age_fact
+gender <- metadata_mm_discovery$gender
+lib_batch <- metadata_mm_discovery$Library_preparation
+sample <-  metadata_mm_discovery$sample
+design = model.matrix(~group + age_fact + gender) 
+
+## normalization + batch correction
+norm_counts_mm_disco <- limma::removeBatchEffect(limma::normalizeVSN(norm.factors),
+                                             batch = lib_batch,
+                                             design = design) %>%
+  data.frame() %>%
+  rownames_to_column(var = "GeneID")
+write_csv(norm_counts_mm_disco, file = here("data/norm_corrected_data/corr_norm_counts_mm_discovery.csv"))
+
+## normalization
+norm_counts_mm_disco <- limma::normalizeVSN(norm.factors) %>% 
+  data.frame() %>%
+  rownames_to_column(var = "GeneID")
+write_csv(norm_counts_mm_disco, file = here("data/norm_corrected_data/norm_counts_mm_discovery.csv"))
+
+## validation set
+norm.factors <- DGEList(counts = filtered_counts_mm_validation, samples = metadata_mm_validation, group = metadata_mm_validation$outcome)
+norm.factors <- calcNormFactors(norm.factors, method = "TMM")
+
+group <- metadata_mm_validation$group
+age <- metadata_mm_validation$age
+age_fact <- metadata_mm_validation$age_fact
+gender <- metadata_mm_validation$gender
+lib_batch <- metadata_mm_validation$Library_preparation
+sample <-  metadata_mm_validation$sample
+design = model.matrix(~group + age_fact + gender) 
+
+norm_counts_mm_valid <- limma::removeBatchEffect(limma::normalizeVSN(norm.factors), 
+                                             batch = lib_batch, 
+                                             design = design) %>% 
+  data.frame() %>%
+  rownames_to_column(var = "GeneID")
+write_csv(norm_counts_mm_valid, file = here("data/norm_corrected_data/corr_norm_counts_mm_validation.csv"))
+
+norm_counts_mm_valid <- limma::normalizeVSN(norm.factors) %>% 
+  data.frame()  %>%
+  rownames_to_column(var = "GeneID")
+
+write_csv(norm_counts_mm_valid, file = here("data/norm_corrected_data/norm_counts_mm_validation.csv"))
+
+```
+
+
+```{r}
+#------- HC
+## discovery test
+# norm.factors <- DGEList(counts = filtered_counts_hc_discovery %>% 
+#                           column_to_rownames(var = "SampleID") %>% 
+#                           t() %>% 
+#                           data.frame(), 
+#                         samples = metadata_hc_discovery, 
+#                         group = metadata_hc_discovery$outcome)
+# norm.factors <- calcNormFactors(norm.factors, method = "TMM")
+# 
+# group <- metadata_hc_discovery$group
+# age <- metadata_hc_discovery$age
+# age_fact <- metadata_hc_discovery$age_fact
+# gender <- metadata_hc_discovery$gender
+# lib_batch <- metadata_hc_discovery$Library_preparation
+# sample <-  metadata_hc_discovery$sample
+# design = model.matrix(~group + age_fact + gender) 
+# 
+# norm_counts_hc_disco <- limma::removeBatchEffect(limma::normalizeVSN(norm.factors), 
+#                                              batch = lib_batch, 
+#                                              design = design) %>% 
+#   data.frame()
+# 
+# norm_counts_hc_disco <- limma::normalizeVSN(norm.factors) %>% 
+#   data.frame()  %>%
+#   rownames_to_column(var = "GeneID")
+# 
+# write_csv(norm_counts_hc_disco, file = here("data/norm_corrected_data/norm_counts_hc_discovery.csv"))
+# 
+# 
+# ## validation set
+# norm.factors <- DGEList(counts = filtered_counts_hc_validation  %>% 
+#                           column_to_rownames(var = "SampleID") %>% 
+#                           t() %>% 
+#                           data.frame(), 
+#                         samples = metadata_hc_validation,
+#                         group = metadata_hc_validation$outcome)
+# norm.factors <- calcNormFactors(norm.factors, method = "TMM")
+# 
+# group <- metadata_hc_validation$group
+# age <- metadata_hc_validation$age
+# age_fact <- metadata_hc_validation$age_fact
+# gender <- metadata_hc_validation$gender
+# lib_batch <- metadata_hc_validation$Library_preparation
+# sample <-  metadata_hc_validation$sample
+# design = model.matrix(~group + age_fact + gender) 
+# 
+# norm_counts_hc_valid <- limma::removeBatchEffect(limma::normalizeVSN(norm.factors), 
+#                                              batch = lib_batch, 
+#                                              design = design) %>% 
+#   data.frame()
+# 
+# norm_counts_hc_valid <- limma::normalizeVSN(norm.factors) %>% 
+#   data.frame()  %>%
+#   rownames_to_column(var = "GeneID")
+# 
+# write_csv(norm_counts_hc_valid, file = here("data/norm_corrected_data/norm_counts_hc_validation.csv"))
+
+```
+
+
+
+```{r}
+#------- Simulated dataset
+group <- metadata_discovery$outcome
+
+## Discovery set
+norm.factors <- DGEList(counts = sim_discovery , samples = metadata_discovery , group = metadata_discovery$outcome)
+norm.factors <- calcNormFactors(norm.factors, method = "TMM")
+
+design = model.matrix(~group) 
+
+norm_counts_sim_discovery <- limma::removeBatchEffect(limma::normalizeVSN(norm.factors), 
+                                             design = design) %>% 
+  data.frame()
+
+norm_counts_sim_discovery <- limma::normalizeVSN(norm.factors) %>% 
+  data.frame()  %>%
+  rownames_to_column(var = "GeneID")
+
+write_csv(norm_counts_sim_discovery, file = here("data/norm_corrected_data/norm_counts_sim_rep_discovery.csv"))
+
+## Validation set
+group = metadata_validation$outcome
+norm.factors <- DGEList(counts = sim_validation, samples = metadata_validation , group = metadata_validation$outcome)
+norm.factors <- calcNormFactors(norm.factors, method = "TMM")
+
+design = model.matrix(~group) 
+
+## Normalization + batch correction
+# norm_counts_sim_validation <- limma::removeBatchEffect(limma::normalizeVSN(norm.factors), 
+#                                              design = design) %>% 
+#   data.frame()
+
+## Normalization 
+norm_counts_sim_validation <- limma::normalizeVSN(norm.factors) %>% 
+  data.frame()  %>%
+  rownames_to_column(var = "GeneID")
+
+write_csv(norm_counts_sim_validation, file = here("data/norm_corrected_data/norm_counts_sim_validation.csv"))
+write_csv(norm_counts_sim_validation, file = here("data/norm_corrected_data/corr_norm_counts_sim_validation.csv"))
+```
+

@@ -1,0 +1,343 @@
+---
+title: "Elastic Net regression"
+author: "Esther Tercero Atencia"
+date: "2023-04-26"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(glmnet)
+library(caret)
+```
+
+This file includes the code necessary to perform Bayesian Adaptive Sampling Feature Selection with both limma and DESeq2 results. Data loading is also available.
+
+## Data loading
+
+```{r}
+# metadata
+metadata <- read.csv("../data/metadata/all_metadata.csv")
+
+# norm counts
+norm_counts_mm_discovery <- read.csv("../data/norm_corrected_data/norm_counts_mm_discovery.csv") %>% 
+  column_to_rownames("GeneID")
+
+# diffexpressed genes
+des_difexpressed_genes_mm <- read.csv("../results/DESeq2_results_mm_discovery.csv") %>% 
+  filter(diffexpressed == "yes") %>% 
+  dplyr::select(gene)
+lim_difexpressed_genes_mm <- read.csv("../results/limma_results_mm_discovery.csv") %>% 
+  filter(diffexpressed == "yes") %>% 
+  dplyr::select(gene)
+
+```
+
+
+## Myeloma multiple
+
+```{r}
+# prepare data and metadata --------------------------
+metadata_mm_disco <- metadata %>% 
+  filter(sample %in% colnames(norm_counts_mm_discovery)) %>%
+  mutate(sample = sample,
+         outcome = as.factor(outcome),
+         age = as.numeric(age),
+         gender = as.factor(gender),
+         RNA_extraction = as.factor(RNA_extraction),
+         Library_preparation = as.factor(as.character(Library_preparation)),
+         group = as.factor(as.character(group)),
+         age_fact = as.factor(cut(age, breaks=4)))
+
+
+genes <- rownames(norm_counts_mm_discovery)
+DE_data_to_fit <- norm_counts_mm_discovery %>% 
+  t() 
+colnames(DE_data_to_fit) <- genes
+
+# arrange DEseq data to fit -------------------------
+des_DE_data_to_fit <- DE_data_to_fit %>% 
+  as.data.frame() %>%
+  dplyr::select(des_difexpressed_genes_mm$gene)
+
+des_DE_data_to_fit <- cbind(metadata_mm_disco %>% 
+                          dplyr::select(sample,group), des_DE_data_to_fit) %>% 
+  tibble() %>%
+  dplyr::mutate(group = as.factor(group)) %>%
+  column_to_rownames(var = "sample")
+
+# arrange limma data to fit ------------------------
+lim_DE_data_to_fit <- DE_data_to_fit %>% 
+  as.data.frame() %>%
+  dplyr::select(lim_difexpressed_genes_mm$gene)
+
+lim_DE_data_to_fit <- cbind(metadata_mm_disco %>% 
+                          dplyr::select(sample,group), lim_DE_data_to_fit) %>% 
+  tibble() %>%
+  dplyr::mutate(group = as.factor(group)) %>%
+  column_to_rownames(var = "sample")
+```
+
+
+```{r elnet fit HC logfold}
+# cross-validation -----------------------------------
+custom <- trainControl(method = "LOOCV",
+                       number = 10, 
+                       verboseIter = TRUE)
+
+# DES-elnet model --------------------------------------
+# Opt
+des_en <- train(group~.,
+            des_DE_data_to_fit,
+            method='glmnet',
+            tuneGrid =expand.grid(alpha=seq(0,1,length=10),
+                                  lambda = seq(0.0000001,0.5,length=5)),
+            trControl=custom)
+
+a <- des_en$bestTune$alpha
+l <- des_en$bestTune$lambda
+
+des_en_mm_plot <- plot(des_en, main = "Elastic Net Regression")
+svg("../results/Elnet_fit_results/elnetplot_des_mm.png")
+des_en_mm_plot
+dev.off()
+
+# Alpha = 0.5
+des_glmnet <- cv.glmnet(as.matrix(des_DE_data_to_fit[,-1]), des_DE_data_to_fit[,1],
+  family = "binomial",
+  alpha = 0.5,
+  grouped = F)
+des_glmnet <- glmnet(as.matrix(des_DE_data_to_fit[,-1]), des_DE_data_to_fit[,1],
+  family = "binomial",
+  alpha = 0.5,
+  lambda = des_glmnet$lambda.min)
+
+
+varimp <- varImp(des_en, scale = T)$importance %>% 
+  arrange(desc(Overall)) %>% 
+  rownames_to_column(var = "GeneID") %>% 
+  filter(Overall > 0)
+
+varimp_final <- varImp(des_glmnet, scale = T, lambda = des_glmnet$lambda) %>% 
+  arrange(desc(Overall)) %>% 
+  rownames_to_column(var = "GeneID") %>% 
+  filter(Overall > 0)
+
+write_csv(varimp, file = "../results/Elnet_fit_results/ElNet_des_mm_opt.csv")
+write_csv(varimp_final, file = "../results/ElNet_fit_results/ElNet_des_alpha.csv")
+
+saveRDS(des_en,
+          file = "../results/ElNet_fit_results/ElNet_des_mm_opt.rds")
+saveRDS(des_glmnet,
+          file = "../results/ElNet_fit_results/ElNet_des_alpha.rds")
+
+
+#limma-elnet model -------------------------------------------------------
+# Opt
+lim_en <- train(group~.,
+            lim_DE_data_to_fit,
+            method='glmnet',
+            tuneGrid =expand.grid(alpha=seq(0,1,length=5),
+                                  lambda = seq(0.0000001,0.4,length=5)),
+            trControl=custom)
+
+a <- lim_en$bestTune$alpha
+l <- lim_en$bestTune$lambda
+
+elnetplot_lim_mm <- plot(lim_en, main = "Elastic Net Regression")
+svg("../results/Elnet_fit_results/elnetplot_lim_mm.png")
+elnetplot_lim_mm
+dev.off()
+
+# Alpha = 0.5
+lim_glmnet <- cv.glmnet(x = as.matrix(lim_DE_data_to_fit[,-1]), lim_DE_data_to_fit[,1],
+  family = "binomial",
+  alpha = 0.5)
+
+lim_glmnet <- glmnet(x = as.matrix(lim_DE_data_to_fit[,-1]), lim_DE_data_to_fit[,1],
+  family = "binomial",
+  alpha = 0.5,
+  lambda = lim_glmnet$lambda.min)
+
+
+# Feature importance of the models
+varimp <- varImp(lim_en, scale = T)$importance %>% 
+  arrange(desc(Overall)) %>% 
+  rownames_to_column(var = "GeneID") %>% 
+  filter(Overall > 0)
+varimp_final <- varImp(lim_glmnet,  lambda = 0.008188) %>% 
+  arrange(desc(Overall)) %>% 
+  rownames_to_column(var = "GeneID") %>% 
+  filter(Overall > 0)
+
+# save results
+write_csv(varimp, file = "../results/Elnet_fit_results/ElNet_lim_mm_opt.csv")
+write_csv(varimp_final, file = "../results/ElNet_fit_results/ElNet_lim_mm_alpha.csv")
+
+saveRDS(lim_en,
+          file = "../results/ElNet_fit_results/ElNet_lim_mm_opt.rds")
+saveRDS(lim_glmnet,
+          file = "../results/ElNet_fit_results/ElNet_lim_mm_alpha.rds")
+```
+
+
+## Simulation analysis
+
+```{r}
+# metadata
+metadata_simulation <- read.csv("../data/simulated_data/metadata")
+colnames(metadata_simulation) <-  c("SampleID", "group")
+
+# norm-counts
+norm_counts_simulation_discovery <- read.csv("../data/norm_corrected_data/norm_counts_sim_discovery.csv") %>% 
+  column_to_rownames(var="GeneID")
+
+metadata_simulation_discovery <- metadata_simulation %>% 
+  filter(SampleID %in% colnames(norm_counts_simulation_discovery))
+
+# diffexpressed genes
+difexpressed_genes_des <- read.csv("../results/DESeq2_results_sim_discovery.csv") %>% 
+  filter(diffexpressed == "yes") %>% 
+  dplyr::select(gene)
+
+difexpressed_genes_limma <- read.csv("../results/limma_results_sim_discovery.csv") %>% 
+  filter(diffexpressed == "yes") %>% 
+  dplyr::select(gene)
+
+```
+
+### Removing DE genes
+```{r}
+# prepare data to fit ------------------------------
+genes <- rownames(norm_counts_simulation_discovery)
+DE_data <- norm_counts_simulation_discovery %>% 
+  t() 
+colnames(DE_data) <- genes
+
+dea_DE_data_to_fit <- DE_data %>% 
+  as.data.frame() %>%
+  dplyr::select(difexpressed_genes_des$gene)
+
+dea_DE_data_to_fit <- cbind(metadata_simulation_discovery %>% 
+                          dplyr::select(SampleID, group), dea_DE_data_to_fit) %>% 
+  tibble() %>%
+  dplyr::mutate(group = as.factor(group)) %>%
+  column_to_rownames(var = "SampleID") 
+
+
+# cross validation -----------------------------------
+custom <- trainControl(method = "LOOCV",
+                       number = 10, #num of resampling iterations
+                       verboseIter = TRUE)
+
+# fit model ----------------------------------------
+results_dea_elnet <- data.frame()
+params <- data.frame()
+
+## iterations are not required (same results obtained)
+for (i in 1:10){
+  en_dea <- train(group~.,
+            dea_DE_data_to_fit,
+            method='glmnet',
+            tuneGrid =expand.grid(alpha=seq(0,1,length=5),
+                                  lambda = seq(0.0000001,0.5,length=5)),
+            trControl=custom)
+  
+  varimp <- varImp(en_dea, scale = T)$importance %>% 
+    arrange(desc(Overall)) %>% 
+    rownames_to_column(var = "GeneID") %>% 
+    filter(Overall > 0) 
+  
+  # results
+  results_dea_elnet <- rbind(results_dea_elnet, varimp)
+  
+  # model parameters
+  params <- rbind(params, data.frame(a = en_dea$bestTune$alpha,
+                                     l = en_dea$bestTune$lambda))
+}
+
+# arrange and save results
+
+sim_lim_en <- plot(en_all, main = "Elastic Net Regression")
+svg("../results/ElNet_fit_results/elnetplot_sim_final.svg"); sim_des_en;dev.off()
+
+resumen_elnet <- results_dea_elnet %>%
+  group_by(GeneID) %>%
+  summarize(mean = mean(as.numeric(Overall)),
+            sd = sd(as.numeric(Overall))) %>%
+  arrange(desc(mean))
+resumen_params <- data.frame(mean = apply(params,2,mean), sd = apply(params,2,sd))
+
+saveRDS(resumen_elnet,
+          file = "../results/ElNet_fit_results/ElNet_sim_final.rds")
+write_csv(resumen_elnet, file = "../results/ElNet_fit_results/ElNet_sim_final.csv")
+write_csv(resumen_params, file = "../results/ElNet_fit_results/ElNet_sim_final_params.csv")
+
+```
+
+### Without removing DE genes
+
+```{r}
+# prepare data to fit ------------------------------
+DE_data <- norm_counts_simulation_discovery %>% 
+  t() 
+
+DE_data_to_fit <- DE_data %>% 
+  as.data.frame()
+
+DE_data_to_fit <- cbind(metadata_simulation_discovery %>% 
+                          dplyr::select(SampleID, group), DE_data_to_fit) %>% 
+  tibble() %>%
+  dplyr::mutate(group = as.factor(group)) %>%
+  column_to_rownames(var = "SampleID") 
+
+# cross validation -------------------------------
+custom <- trainControl(method = "LOOCV",
+                       number = 10, #num of resampling iterations
+                       verboseIter = TRUE)
+
+# fit model ----------------------------------------
+results_dea_elnet <- data.frame()
+params <- data.frame()
+
+## iterations are not required (same results obtained)
+for (i in 1:10){
+  en_all <- train(group~.,
+            DE_data_to_fit,
+            method='glmnet',
+            tuneGrid =expand.grid(alpha=seq(0,1,length=5),
+                                  lambda = seq(0.0000001,0.5,length=5)),
+            trControl=custom)
+  
+  varimp <- varImp(en_all, scale = T)$importance %>% 
+    arrange(desc(Overall)) %>% 
+    rownames_to_column(var = "GeneID") %>% 
+    filter(Overall > 0) 
+  
+  # results 
+  results_dea_elnet <- rbind(results_dea_elnet, varimp)
+  
+  # model parameters
+  params <- rbind(params, data.frame(a = en_all$bestTune$alpha,
+                                     l = en_all$bestTune$lambda))
+}
+
+# arrange and save results
+
+sim_lim_en <- plot(en_all, main = "Elastic Net Regression")
+svg("../results/ElNet_fit_results/elnetplot_simall.svg"); sim_des_en;dev.off()
+
+resumen_all_elnet <- results_dea_elnet %>%
+  group_by(GeneID) %>%
+  summarize(mean = mean(as.numeric(Overall)),
+            sd = sd(as.numeric(Overall))) %>%
+  arrange(desc(mean))
+resumen_params <- data.frame(mean = apply(params,2,mean), sd = apply(params,2,sd))
+
+saveRDS(resumen_all_elnet,
+          file = "../results/ElNet_fit_results/ElNet_simall_final.rds")
+write_csv(resumen_all_elnet, file = "../results/ElNet_fit_results/ElNet_simall_final.csv")
+write_csv(resumen_params, file = "../results/ElNet_fit_results/ElNet_simall_final_params.csv")
+
+```

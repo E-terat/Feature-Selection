@@ -1,0 +1,91 @@
+sample,outcome,age,gender,RNA_extraction,Library_preparation,set,race,group
+PP002,HD,64, Female,batch1,batch1,pilot,WHITE,Non-Cancer
+PP003,HD,42, Male,batch1,batch1,pilot,ASIAN,Non-Cancer
+PP004,HD,46, Female,batch1,batch1,pilot,WHITE,Non-Cancer
+PP005,MM,60, Male,batch1,batch1,pilot,WHITE,Multiple Myeloma
+PP007,MM,50, Female,batch1,batch1,pilot,WHITE,Multiple Myeloma
+PP008,MM,70, Female,batch1,batch1,pilot,WHITE,Multiple Myeloma
+PP010,MM,66, Male,batch2,batch1,pilot,WHITE,Multiple Myeloma
+PP011,HD,60, Female,batch2,batch1,pilot,WHITE,Non-Cancer
+PP012,HD,30, Male,batch2,batch1,pilot,WHITE,Non-Cancer
+PP015,MM,66, Female,batch2,batch1,pilot,WHITE,Multiple Myeloma
+PP016,HD,66, Female,batch2,batch1,pilot,WHITE,Non-Cancer
+PP017,MGUS,64, Male,batch3,batch1,pilot,WHITE,MGUS
+PP018,MGUS,73, Male,batch3,batch1,pilot,WHITE,MGUS
+PP019,HD,59, Female,batch3,batch1,pilot,WHITE,Non-Cancer
+PP020,HD,60, Female,batch3,batch1,pilot,WHITE,Non-Cancer
+PP026,HC,65, Male,batch4,batch1,pilot,OTHER,Liver Cancer
+PP027,HC,73, Male,batch4,batch1,pilot,WHITE,Liver Cancer
+PP029,HD,51, Male,batch4,batch1,pilot,ASIAN,Non-Cancer
+PP031,HC,51, Male,batch4,batch1,pilot,WHITE,Liver Cancer
+PP032,HD,57, Male,batch4,batch1,pilot,WHITE,Non-Cancer
+PP035,Cirr,48, Female,batch4,batch2,pilot,WHITE,Liver Cirrhosis
+PP036,MGUS,57, Male,batch4,batch2,pilot,WHITE,MGUS
+PP041,HD,64, Female,batch5,batch2,pilot,WHITE,Non-Cancer
+PP043,HD,42, Male,batch5,batch2,pilot,WHITE,Non-Cancer
+PP046,HD,53, Female,batch5,batch2,pilot,WHITE,Non-Cancer
+PP047,MM,31, Male,batch5,batch2,pilot,WHITE,Multiple Myeloma
+PP048,HC,60, Female,batch5,batch2,pilot,WHITE,Liver Cancer
+PP049,MM,73, Male,batch6,batch2,pilot,WHITE,Multiple Myeloma
+PP050,HC,82, Female,batch6,batch2,pilot,WHITE,Liver Cancer
+PP055,HD,37, Female,batch6,batch2,pilot,WHITE,Non-Cancer
+PP058,MGUS,67, Male,batch7,batch2,pilot,WHITE,MGUS
+PP060,MGUS,68, Male,batch7,batch2,pilot,WHITE,MGUS
+PP061,Cirr,50, Female,batch7,batch2,pilot,WHITE,Liver Cirrhosis
+PP062,HD,71, Female,batch7,batch2,pilot,WHITE,Non-Cancer
+PP073,MM,66, Male,batch8,batch3,pilot,WHITE,Multiple Myeloma
+PP074,MM,35, Female,batch8,batch3,pilot,WHITE,Multiple Myeloma
+PP075,Cirr,33, Male,batch8,batch3,pilot,WHITE,Liver Cirrhosis
+PP078,Cirr,59, Female,batch8,batch3,pilot,WHITE,Liver Cirrhosis
+PP084,MGUS,84, Female,NA,NA,pilot,NA,NA
+PP087,HD,41, Female,batch9,batch3,pilot,WHITE,Non-Cancer
+PP091,HD,70, Male,batch10,batch3,pilot,WHITE,Non-Cancer
+PP097,MGUS,64, Female,batch11,batch4,pilot,WHITE,MGUS
+PP098,MM,55, Male,batch11,batch4,pilot,WHITE,Multiple Myeloma
+PP099,HC,72, Male,batch11,batch4,pilot,WHITE,Liver Cancer
+PP102,HD,47, Male,batch11,batch4,pilot,WHITE,Non-Cancer
+PP103,MGUS,56, Female,batch11,batch4,pilot,WHITE,MGUS
+PP105,HD,43, Female,batch11,batch4,pilot,WHITE,Non-Cancer
+PP109,HC,75, Female,batch12,batch4,pilot,WHITE,Liver Cancer
+PP111,HC,50, Male,batch12,batch4,pilot,WHITE,Liver Cancer
+PP114,MGUS,70, Female,batch12,batch4,pilot,WHITE,MGUS
+PP116,HD,60, Male,batch12,batch4,pilot,WHITE,Non-Cancer
+RSQ_041,MM,51, Male,batch4,batch3,validation,WHITE,Multiple Myeloma
+RSQ_047,HD,27, Female,batch1,batch1,validation,ASIAN,Non-Cancer
+RSQ_049,HC,67, Male,batch1,batch2,validation,WHITE,Liver Cancer
+RSQ_051,HD,60, Female,batch1,batch2,validation,WHITE,Non-Cancer
+RSQ_054,HC,81, Female,batch1,batch2,validation,WHITE,Liver Cancer
+RSQ_055,HC,64, Female,batch1,batch2,validation,WHITE,Liver Cancer
+RSQ_060,HC,69, Male,batch5,batch2,validation,WHITE,Liver Cancer
+RSQ_065,HD,74, Female,batch2,batch2,validation,WHITE,Non-Cancer
+RSQ_066,HC,72, Female,batch2,batch2,validation,WHITE,Liver Cancer
+RSQ_067,HD,72, Male,batch2,batch2,validation,WHITE,Non-Cancer
+RSQ_068,HD,64, Female,batch2,batch2,validation,WHITE,Non-Cancer
+RSQ_069,HC,62, Male,batch2,batch2,validation,WHITE,Liver Cancer
+RSQ_070,HD,62, Male,batch2,batch2,validation,WHITE,Non-Cancer
+RSQ_071,HD,21, Male,batch2,batch2,validation,WHITE,Non-Cancer
+RSQ_072,HC,76, Female,batch2,batch2,validation,WHITE,Liver Cancer
+RSQ_073,HD,25, Female,batch3,batch2,validation,WHITE,Non-Cancer
+RSQ_074,HD,54, Female,batch3,batch2,validation,WHITE,Non-Cancer
+RSQ_076,HC,61, Male,batch3,batch2,validation,WHITE,Liver Cancer
+RSQ_077,HD,64, Female,batch3,batch2,validation,WHITE,Non-Cancer
+RSQ_078,HC,67, Male,batch3,batch2,validation,WHITE,Liver Cancer
+RSQ_132,HC,76, Male,batch6,batch5,validation,WHITE,Liver Cancer
+RSQ_134,HC,65, Female,batch6,batch5,validation,WHITE,Liver Cancer
+RSQ_135,HC,47, Male,batch6,batch5,validation,WHITE,Liver Cancer
+RSQ_138,HC,78, Female,batch7,batch5,validation,WHITE,Liver Cancer
+RSQ_141,HC,71, Male,batch7,batch5,validation,WHITE,Liver Cancer
+RSQ_160,HC,71, Male,batch8,batch6,validation,WHITE,Liver Cancer
+RSQ_169,HC,66, Male,batch7,batch3,validation,WHITE,Liver Cancer
+RSQ_171,HC,71, Male,batch6,batch3,validation,WHITE,Liver Cancer
+RSQ_177,MM,68, Male,batch4,batch4,validation,WHITE,Multiple Myeloma
+RSQ_178,MM,67, Male,batch4,batch4,validation,WHITE,Multiple Myeloma
+RSQ_179,MM,63, Female,batch4,batch4,validation,WHITE,Multiple Myeloma
+RSQ_180,MM,74, Female,batch4,batch4,validation,WHITE,Multiple Myeloma
+RSQ_181,MM,63, Male,batch4,batch4,validation,WHITE,Multiple Myeloma
+RSQ_182,MM,28, Male,batch4,batch4,validation,WHITE,Multiple Myeloma
+RSQ_183,MM,60, Female,batch4,batch4,validation,WHITE,Multiple Myeloma
+RSQ_184,MM,67, Female,batch4,batch4,validation,WHITE,Multiple Myeloma
+RSQ_188,HC,82, Male,batch9,batch4,validation,WHITE,Liver Cancer
+RSQ_190,HC,67, Male,batch9,batch4,validation,WHITE,Liver Cancer
+RSQ_192,HC,78, Female,batch9,batch4,validation,WHITE,Liver Cancer

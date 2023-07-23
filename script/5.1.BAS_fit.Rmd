@@ -1,0 +1,291 @@
+---
+title: "BAS models"
+author: "Esther Tercero Atencia"
+date: "2023-04-26"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(plotly)
+library(tidyverse)
+library(ggrepel)
+library(BAS)
+library(ggpubr)
+library(MASS)
+library(dplyr)
+```
+
+This file includes the code necessary to perform Bayesian Adaptive Sampling Feature Selection with both limma and DESeq2 results. Data loading is also available.
+
+## Myeloma multiple
+
+```{r data loading}
+# data loading
+metadata <- read.csv("../data/metadata/all_metadata.csv")
+norm_counts_mm_discovery <- read.csv("../data/norm_corrected_data/norm_counts_mm_discovery.csv") %>% 
+  column_to_rownames("GeneID")
+
+norm_counts_sim_discovery <- read.csv("../data/norm_corrected_data/norm_counts_sim_discovery.csv") %>% 
+  column_to_rownames("GeneID")
+```
+
+### DESeq2 results
+```{r}
+# metadata
+metadata_mm_disco <- metadata %>% 
+  filter(sample %in% colnames(norm_counts_mm_discovery)) %>%
+  mutate(sample = sample,
+         outcome = as.factor(outcome),
+         age = as.numeric(age),
+         gender = as.factor(gender),
+         RNA_extraction = as.factor(RNA_extraction),
+         Library_preparation = as.factor(as.character(Library_preparation)),
+         group = as.factor(as.character(group)),
+         age_fact = as.factor(cut(age, breaks=4)))
+
+# genes diffexpressed using DESeq2
+difexpressed_genes <- read.csv("../results/DESeq2_results_mm_discovery.csv") %>% 
+  filter(diffexpressed == "yes") %>% 
+  dplyr::select(gene)
+```
+
+```{r}
+# arrange data 
+genes <- rownames(norm_counts_mm_discovery)
+DE_data_to_fit <- norm_counts_mm_discovery %>% 
+  t()
+colnames(DE_data_to_fit) <- genes
+DE_data_to_fit <- DE_data_to_fit %>% 
+  as.data.frame() %>%
+  dplyr::select(difexpressed_genes$gene) %>% 
+  rownames_to_column(var = "sample")
+
+DE_data_to_fit <- merge(metadata_mm_disco %>% 
+                          dplyr::select(sample,group), DE_data_to_fit, by="sample") %>% 
+  tibble() %>%
+  dplyr::mutate(group = as.factor(group)) %>%
+  column_to_rownames(var = "sample")
+
+# fit BAS model (with 10 reps)
+results_dea <- data.frame()
+for (i in 1:10){
+  # bas model
+  bas_fit_mm <- bas.glm(formula = group ~ ., 
+                     data = DE_data_to_fit, 
+                     family = binomial(link = "logit"), 
+                     laplace = T, 
+                     method = "BAS")
+  
+  # arrange results for each iteration
+  sum_fit_sim <- summary(bas_fit_sim) %>% 
+    as.data.frame() %>% 
+    dplyr::arrange(desc(`P(B != 0 | Y)`)) %>% 
+    rownames_to_column(var = "ID") %>%
+    dplyr::select(ID, `P(B != 0 | Y)`) 
+  
+  sum_fit_sim <- sum_fit_sim[-grep("Intercept", sum_fit_sim$ID),] %>% 
+    dplyr::slice_head(n = length(sum_fit_sim)-7)  %>%
+    as.matrix()
+  
+  # save iteration in the main dataset
+  results_dea <- rbind(results_dea, sum_fit_sim)
+}
+
+# arrange results by gene
+resumen <- results_dea %>%
+  group_by(ID) %>%
+  summarize(mean = mean(as.numeric(`P(B != 0 | Y)`)),
+            sd = sd(as.numeric(`P(B != 0 | Y)`))) %>%
+  arrange(desc(mean))
+
+# save results
+write_csv(resumen, file = "../results/BAS_fit_results/BAS_DESeq2_mm.csv")
+```
+
+
+### limma results
+```{r}
+# genes diffexpressed using Limma
+difexpressed_genes <- read.csv("../results/limma_results_mm_discovery.csv") %>% 
+  filter(diffexpressed == "yes") %>% 
+  dplyr::select(gene)
+```
+
+```{r}
+# arrange data 
+genes <- rownames(norm_counts_mm_discovery)
+DE_data_to_fit <- norm_counts_mm_discovery %>% 
+  t() 
+colnames(DE_data_to_fit) <- genes
+DE_data_to_fit <- DE_data_to_fit %>% 
+  as.data.frame() %>%
+  dplyr::select(difexpressed_genes$gene)
+
+DE_data_to_fit <- cbind(metadata_mm_disco %>% 
+                          dplyr::select(sample,group), DE_data_to_fit) %>% 
+  tibble() %>%
+  dplyr::mutate(group = as.factor(group)) %>%
+  column_to_rownames(var = "sample")
+
+# fit BAS model (with 10 reps)
+results_dea <- data.frame()
+for (i in 1:10){
+  # bas model
+  bas_fit_mm <- bas.glm(formula = group ~ ., 
+                     data = DE_data_to_fit, 
+                     family = binomial(link = "logit"), 
+                     laplace = T, 
+                     method = "BAS")
+  
+  # arrange results for each iteration
+  sum_fit_sim <- summary(bas_fit_sim) %>% 
+    as.data.frame() %>% 
+    dplyr::arrange(desc(`P(B != 0 | Y)`)) %>% 
+    rownames_to_column(var = "ID") %>%
+    dplyr::select(ID, `P(B != 0 | Y)`) 
+  
+  sum_fit_sim <- sum_fit_sim[-grep("Intercept", sum_fit_sim$ID),] %>% 
+    dplyr::slice_head(n = length(sum_fit_sim)-7)  %>%
+    as.matrix()
+  
+  # save iteration in the main dataset
+  results_dea <- rbind(results_dea, sum_fit_sim)
+}
+
+# arrange results by gene
+resumen <- results_dea %>%
+  group_by(ID) %>%
+  summarize(mean = mean(as.numeric(`P(B != 0 | Y)`)),
+            sd = sd(as.numeric(`P(B != 0 | Y)`))) %>%
+  arrange(desc(mean))
+
+
+# write csv
+write_csv(resumen, file = "./results/BAS_fit_results/BAS_limma_mm.csv")
+```
+
+## Simulation analysis
+
+```{r load sim data}
+# data loading 
+metadata_simulation <- read.csv("../data/simulated_data/metadata") %>%
+  mutate(SampleID = SampleID,
+         group = group,
+         .keep = "none")
+
+norm_counts_simulation_discovery <- read.csv("../data/norm_corrected_data/norm_counts_sim_discovery.csv") %>% 
+  column_to_rownames(var="GeneID") %>%
+  t() %>%
+  data.frame()
+
+metadata_simulation_discovery <- metadata_simulation %>% 
+  filter(SampleID %in% rownames(norm_counts_simulation_discovery))
+
+difexpressed_genes <- read.csv("../results/DESeq2_results_sim_discovery.csv") %>% 
+  filter(diffexpressed == "yes") %>% 
+  dplyr::select(gene)
+```
+
+### Removing DE genes
+```{r}
+# arrange data 
+genes <- colnames(norm_counts_simulation_discovery)
+DE_data <- norm_counts_simulation_discovery
+colnames(DE_data) <- genes
+
+DE_data_to_fit <- DE_data %>% 
+  as.data.frame() %>%
+  dplyr::select(difexpressed_genes$gene)
+
+DE_data_to_fit <- cbind(metadata_simulation_discovery %>% 
+                          dplyr::select(SampleID, group), DE_data_to_fit) %>% 
+  tibble() %>%
+  dplyr::mutate(group = as.factor(group)) %>%
+  column_to_rownames(var = "SampleID") 
+
+results_dea <- data.frame()
+
+for (i in 1:10){
+  # bas model
+  bas_fit_sim <- bas.glm(formula = group ~ ., 
+                     data = DE_data_to_fit, 
+                     family = binomial(link = "logit"), 
+                     laplace = T)
+  
+  # arrange results for each iteration
+  sum_fit_sim <- summary(bas_fit_sim) %>% 
+    as.data.frame() %>% 
+    dplyr::arrange(desc(`P(B != 0 | Y)`)) %>% 
+    rownames_to_column(var = "ID") %>%
+    dplyr::select(ID, `P(B != 0 | Y)`) 
+  
+  sum_fit_sim <- sum_fit_sim[-grep("Intercept", sum_fit_sim$ID),] %>% 
+    dplyr::slice_head(n = length(sum_fit_sim)-7)  %>%
+    as.matrix()
+  
+  # save iteration in the main dataset
+  results_dea <- rbind(results_dea, sum_fit_sim)
+}
+
+# arrange results by gene
+resumen <- results_dea %>%
+  group_by(ID) %>%
+  summarize(mean = mean(as.numeric(`P(B != 0 | Y)`)),
+            sd = sd(as.numeric(`P(B != 0 | Y)`))) %>%
+  arrange(desc(mean))
+
+# write csv
+write_csv(resumen, file = "../results/BAS_fit_results/BAS_sim_final.csv")
+```
+
+
+### Without removing DE genes 
+
+```{r}
+# arrange data 
+genes <- colnames(norm_counts_simulation_discovery)
+DE_data <- norm_counts_simulation_discovery
+colnames(DE_data) <- genes
+DE_data_to_fit_all <- DE_data %>% 
+  as.data.frame() 
+
+DE_data_to_fit_all <- cbind(metadata_simulation_discovery %>% 
+                          dplyr::select(SampleID, group), DE_data_to_fit_all) %>% 
+  tibble() %>%
+  dplyr::mutate(group = as.factor(group)) %>%
+  column_to_rownames(var = "SampleID") 
+
+results <- data.frame()
+for (i in 1:10){
+  # bas model
+  bas_fit_sim <- bas.glm(formula = group ~ ., 
+                     data = DE_data_to_fit_all, 
+                     family = binomial(link = "logit"), 
+                     laplace = T)
+  
+  # arrange results for each iteration
+  sum_fit_sim <- summary(bas_fit_sim) %>% 
+    as.data.frame() %>% 
+    dplyr::arrange(desc(`P(B != 0 | Y)`)) %>% 
+    rownames_to_column(var = "ID") %>%
+    dplyr::select(ID, `P(B != 0 | Y)`) 
+  
+  sum_fit_sim <- sum_fit_sim[grep("Gene", sum_fit_sim$ID),] %>% 
+    as.matrix()
+  
+  # save iteration in the main dataset
+  results <- rbind(results, sum_fit_sim)
+}
+
+# arrange results by gene
+resumen_all <- results %>%
+  group_by(ID) %>%
+  summarize(mean = mean(as.numeric(`P(B != 0 | Y)`)),
+            sd = sd(as.numeric(`P(B != 0 | Y)`))) %>%
+  arrange(desc(mean))
+
+# write csv
+write_csv(resumen_all, file = "../results/BAS_fit_results/BAS_simall_final.csv")
+```
+

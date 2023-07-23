@@ -1,0 +1,242 @@
+---
+title: "PCA myeloma multiple"
+author: "Esther Tercero Atencia"
+date: "2023-05-17"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(plotly)
+```
+
+## In this document we will load the MYLEOMA MULTIPLE dataset already filtered and plot Principal Component Analysis before and after normalization and correction by possible confounding variables. 
+
+## Some details about the procedure:
+
+> Normalization is performed with vsn approach (code for TMM normalization is also avaiable)
+> PCA helps to evaluate any possible effect of the intrinsic properties of the sample (code for 2d and 3d PCA avaiable)
+> In MYELOMA MULTIPLE dataset we've got as confounding factors: group, age, gender, rna batch and library batch. For Age (continuous variable) we created a new discrete variable called `age2`, dividing samples in four groups "<25 years", "25-40 years","45-65 years", ">65 years". RNA and library showed collinearity, so here we'll provide the correction using both alone. Then the best PCA (the one that shows more correction) helped us to finally select the library batch correction.
+> Some races (other, asian) were only represented by one sample, so batch couldn't be corrected. Those samples were discarded because preliminar PCAs separate samples by race. 
+
+```{r}
+# metadata
+metadata_mm <- read.csv(here("data/metadata/all_metadata_prep.csv")) %>% 
+  filter(outcome == "MM" | outcome == "HD") %>%
+  filter(grepl("PP", sample)) %>%
+  dplyr::select(-X)
+
+# filtered counts
+filt_mm <- read.csv(here("data/filtered_data/filtered_dedupCounts_mm.csv")) %>%
+  column_to_rownames(var = "GeneID") %>%
+  dplyr::select(metadata_mm$sample)
+
+
+group <- metadata_mm$group
+age <- metadata_mm$age
+age2 <-  cut(metadata_mm$age, 
+             breaks = c(0, 25, 45, 65, 100), 
+             labels = c("<25", "25-40","45-65", ">65"))
+gender <- metadata_mm$gender
+race <- metadata_mm$race
+rna_batch <- metadata_mm$RNA_extraction
+lib_batch <- metadata_mm$Library_preparation
+```
+
+```{r}
+## pca without normalization and correction
+pca <- prcomp(t(filt_mm))
+pcamat1 <- as.data.frame(pca$x) %>%
+  rownames_to_column(var="sample") %>%
+  merge(metadata_mm, by="sample")
+
+var_exp <- round(pca$sdev^2/sum(pca$sdev^2)*100,2)
+
+## split by group
+p1 <- ggplot(pcamat1,aes(PC1,PC2,colour=group))+
+  geom_point(size=2)+
+  theme_bw() +
+  labs(
+    x = paste("PC1 (", var_exp[1],"%)", sep=""),
+    y = paste("PC2 (", var_exp[2],"%)", sep=""),
+    title = paste0("PCA splitted by ", "group")
+  ) +
+    ggsci::scale_color_npg()
+
+## split by age
+p2 <- ggplot(pcamat1,aes(PC1,PC2,colour=age2))+
+  geom_point(size=2)+
+  theme_bw() +
+  labs(
+    x = paste("PC1 (", var_exp[1],"%)", sep=""),
+    y = paste("PC2 (", var_exp[2],"%)", sep=""),
+    title = paste0("PCA splitted by ", "age")
+  ) +
+    ggsci::scale_color_npg()
+
+## split by gender
+p3 <- ggplot(pcamat1,aes(PC1,PC2,colour=gender))+
+  geom_point(size=2)+
+  theme_bw() +
+  labs(
+    x = paste("PC1 (", var_exp[1],"%)", sep=""),
+    y = paste("PC2 (", var_exp[2],"%)", sep=""),
+    title = paste0("PCA splitted by ", "gender")
+  ) +
+    ggsci::scale_color_npg()
+
+## split by race
+p4 <- ggplot(pcamat1,aes(PC1,PC2,colour=race))+
+  geom_point(size=2)+
+  theme_bw() +
+  labs(
+    x = paste("PC1 (", var_exp[1],"%)", sep=""),
+    y = paste("PC2 (", var_exp[2],"%)", sep=""),
+    title = paste0("PCA splitted by ", "race")
+  ) +
+    ggsci::scale_color_npg()
+
+## split by rna_batch
+p5 <- ggplot(pcamat1,aes(PC1,PC2,colour=RNA_extraction))+
+  geom_point(size=2)+
+  theme_bw() +
+  labs(
+    x = paste("PC1 (", var_exp[1],"%)", sep=""),
+    y = paste("PC2 (", var_exp[2],"%)", sep=""),
+    title = paste0("PCA splitted by ", "rna batch")
+  ) +
+    ggsci::scale_color_npg() +
+  scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#8B4513", "#F1C40F", "#2E86C1", 
+                              "#27AE60", "#8E44AD", "#C0392B", "#000000","#16c000",  "#3498DB"))
+
+## split by lib_batch
+p6 <- ggplot(pcamat1,aes(PC1,PC2,colour=Library_preparation))+
+  geom_point(size=2)+
+  theme_bw() +
+  labs(
+    x = paste("PC1 (", var_exp[1],"%)", sep=""),
+    y = paste("PC2 (", var_exp[2],"%)", sep=""),
+    title = paste0("PCA splitted by ", "lib batch")
+  ) +
+    ggsci::scale_color_npg()
+
+pca_2d_mm <- ggarrange(p1,p2,p3,p4,p5,p6, nrow = 2, ncol =3)
+pca_3d_mm <- plot_ly(pcamat1, x = ~PC1, y = ~PC2, z = ~PC3, color = ~group, colors = c('#636EFA','#EF553B') ) %>%
+  add_markers()
+
+svg(here("/results/PCA/PCA_2d_mm.svg"), width =20, height = 10); pca_2d_mm; # dev.off()
+```
+
+```{r}
+## pca with normalization and correction
+## calculate norm factors for TMM normalization
+norm.factors <- DGEList(counts = filt_mm, samples = metadata_mm, group = metadata_mm$outcome)
+norm.factors <- calcNormFactors(norm.factors, method = "TMM") 
+
+## design matrix for correction
+design = model.matrix(~group + age + gender) 
+
+## normalization with vsn
+norm_counts_mm_vsn <- limma::removeBatchEffect(limma::normalizeVSN(norm.factors), 
+                                             batch = lib_batch, 
+                                             design = design) %>% 
+   data.frame()
+
+## normalization with tmm
+norm_counts_mm_tmm <- limma::removeBatchEffect(cpm(norm.factors, log = TRUE), 
+                                             batch = lib_batch, 
+                                             design = design) %>% 
+   data.frame()
+
+
+## change norm_mm WITH THE SPECIFYC NORMALIZATION to continue
+
+norm_mm <- norm_counts_mm_vsn
+#norm_mm <- norm_counts_mm_tmm
+
+pca <- prcomp(t(norm_mm))
+pcamat1 <- as.data.frame(pca$x) %>%
+  rownames_to_column(var="sample") %>%
+  cbind(metadata_mm %>% dplyr::select(-sample))
+
+var_exp <- round(pca$sdev^2/sum(pca$sdev^2)*100,2)
+
+## split by group
+p1 <- ggplot(pcamat1,aes(PC1,PC2,colour=group))+
+  geom_point(size=2)+
+  theme_bw() +
+  labs(
+    x = paste("PC1 (", var_exp[1],"%)", sep=""),
+    y = paste("PC2 (", var_exp[2],"%)", sep=""),
+    title = paste0("PCA splitted by ", "group")
+  ) +
+    ggsci::scale_color_npg()
+
+## split by age
+
+p2 <- ggplot(pcamat1,aes(PC1,PC2,colour=age2))+
+  geom_point(size=2)+
+  theme_bw() +
+  labs(
+    x = paste("PC1 (", var_exp[1],"%)", sep=""),
+    y = paste("PC2 (", var_exp[2],"%)", sep=""),
+    title = paste0("PCA splitted by ", "age")
+  ) +
+    ggsci::scale_color_npg()
+
+## split by gender
+p3 <- ggplot(pcamat1,aes(PC1,PC2,colour=gender))+
+  geom_point(size=2)+
+  theme_bw() +
+  labs(
+    x = paste("PC1 (", var_exp[1],"%)", sep=""),
+    y = paste("PC2 (", var_exp[2],"%)", sep=""),
+    title = paste0("PCA splitted by ", "gender")
+  ) +
+    ggsci::scale_color_npg()
+
+## split by race
+p4 <- ggplot(pcamat1,aes(PC1,PC2,colour=race))+
+  geom_point(size=2)+
+  theme_bw() +
+  labs(
+    x = paste("PC1 (", var_exp[1],"%)", sep=""),
+    y = paste("PC2 (", var_exp[2],"%)", sep=""),
+    title = paste0("PCA splitted by ", "race")
+  ) +
+    ggsci::scale_color_npg()
+
+## split by rna_batch
+p5 <- ggplot(pcamat1,aes(PC1,PC2,colour=RNA_extraction))+
+  geom_point(size=2)+
+  theme_bw() +
+  labs(
+    x = paste("PC1 (", var_exp[1],"%)", sep=""),
+    y = paste("PC2 (", var_exp[2],"%)", sep=""),
+    title = paste0("PCA splitted by ", "rna batch")
+  ) +
+    ggsci::scale_color_npg() +
+  scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#8B4513", "#F1C40F", "#2E86C1", 
+                              "#27AE60", "#8E44AD", "#C0392B", "#000000","#16c000",  "#3498DB"))
+
+## split by lib_batch
+p6 <- ggplot(pcamat1,aes(PC1,PC2,colour=Library_preparation))+
+  geom_point(size=2)+
+  theme_bw() +
+  labs(
+    x = paste("PC1 (", var_exp[1],"%)", sep=""),
+    y = paste("PC2 (", var_exp[2],"%)", sep=""),
+    title = paste0("PCA splitted by ", "lib batch")
+  ) +
+    ggsci::scale_color_npg()
+
+pca_2d_mm <- ggarrange(p1,p2,p3,p4,p5,p6, nrow = 2, ncol =3)
+pca_3d_mm <- plot_ly(pcamat1, x = ~PC1, y = ~PC2, z = ~PC3, color = ~group, colors = c('#636EFA','#EF553B') ) %>%
+  add_markers()
+
+svg(here("results/PCA/PCA_2d_mm_norm_vsn.svg"), width =20, height = 10); pca_2d_mm ; dev.off()
+#svg(here("results/PCA/PCA_2d_mm_norm_tmm.svg"), width =20, height = 10); pca_2d_mm ; dev.off()
+
+
+```
+

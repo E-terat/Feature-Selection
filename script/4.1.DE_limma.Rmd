@@ -1,0 +1,196 @@
+---
+title: "Differential expression using limma"
+author: "Esther Tercero Atencia"
+date: "2023-04-26"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggrepel)
+library(DESeq2)
+library(edgeR)
+library(ggpubr)
+library(MASS)
+library(dplyr)
+library(limma)
+source("../utils/functions.R")
+```
+
+In this file we include the code necessary to perform DEA using Limma approach. Data loading is also available.
+
+## Data loading
+
+```{r load data}
+metadata <- read.csv("../data/metadata/all_metadata.csv")
+
+filtered_counts_mm <- read.csv("../data/filtered_data/filtered_dedupCounts_mm.csv") %>% 
+  column_to_rownames("GeneID")
+filtered_counts_mm_discovery <- read.csv("../data/filtered_data/filtered_mm_discovery.csv") %>% 
+  column_to_rownames("GeneID")
+```
+
+## Myeloma multiple
+
+```{r}
+# metadata
+metadata_mm_disco <- metadata %>% 
+  filter(sample %in% colnames(filtered_counts_mm_discovery)) %>%
+  mutate(sample = sample,
+         outcome = as.factor(outcome),
+         age = as.numeric(age),
+         gender = as.factor(gender),
+         RNA_extraction = as.factor(RNA_extraction),
+         Library_preparation = as.factor(as.character(Library_preparation)),
+         group = as.factor(as.character(group)),
+         age_fact = as.factor(cut(age, breaks=4)))
+
+```
+
+
+```{r}
+# correction and normalization using Limma approach
+design_correction <- model.matrix(~ 0 + group + gender + age_fact + Library_preparation, data = metadata_mm_disco)
+colnames(design_correction) <- make.names(colnames(design_correction))
+
+# specify contrast  
+contr_matrix <- makeContrasts(CancervsControl = groupMultiple.Myeloma - groupNon.Cancer, 
+                              levels = colnames(design_correction))
+counts_matrix = as.matrix(filtered_counts_mm_discovery)
+dge_dataset = DGEList(counts_matrix, group = factor(metadata_mm_disco$outcome))
+dge_dataset = calcNormFactors(dge_dataset, method="TMM")
+
+# compute cpm to TMM normalization (out of Limma pipeline)
+# norm_cpm <- cpm(dge_dataset, log = TRUE)
+# norm_cpm_nobatch <- removeBatchEffect(cpm(dge_dataset, log=TRUE),
+#                                       design=design_correction)
+
+dge_dataset$counts = dge_dataset$counts[, match(as.character(metadata_mm_disco$sample), as.character(colnames(dge_dataset$counts)))]
+dge_dataset$samples = dge_dataset$sample[match(as.character(metadata_mm_disco$sample), as.character(rownames(dge_dataset$sample))),]
+
+# combine obs weigths with sample quality weights
+all_voom_1 = voomWithQualityWeights(
+    dge_dataset,
+    design_correction,
+    method = "genebygene",
+    maxiter = 100,
+    tol = 1e-6
+  )
+# fit the linear model
+fit = lmFit(all_voom_1, design_correction)
+vfit <- contrasts.fit(fit, contrasts=contr_matrix)
+
+# calculate moderated statistics
+fit <- eBayes(vfit, robust = TRUE)
+
+plotsa_mm <- plotSA(fit, main="Final model: Mean-variance trend")
+ggsave("../results/Limma_SAplot_mm.png", plot = plotsa_mm, device="png", dpi=600, bg = "white")
+
+# summary(decideTests(fit))
+
+# arrange results
+out <- topTable(fit, coef=1, sort.by="B", resort.by = "logFC", number = Inf, confint = TRUE) %>%
+  rownames_to_column(var = "gene")
+
+# set diffexpressed genes (pvalue < 0.05 and log2fc > 0.5 -in abs value-)
+out$diffexpressed <- "no"
+out$diffexpressed <- ifelse(out$adj.P.Val < 0.05 & (out$logFC > 0.5 | out$logFC < -0.5), "yes", "no")
+
+# save results  
+write_csv(out, file = "../results/limma_results_mm_discovery.csv")
+
+# volcano plot with results
+plot_mm <- ggplot(data=out, aes(x=logFC, y=-log10(adj.P.Val), col=diffexpressed)) + 
+        geom_point(aes(alpha = diffexpressed)) + 
+        theme_minimal() +
+        scale_color_manual(values=c("gray", "#FF7829")) + 
+        scale_alpha_manual(values=c(0.6,0.3)) +
+        geom_vline(xintercept=c(-0.5, 0.5), col="black", lty = "dashed") +
+        geom_hline(yintercept=-log10(0.05), col="black", lty = "dashed") +
+        ggtitle("Limma in Myeloma Multiple")
+ggsave("../results/Limma_plot_mm.png", plot = plot_mm, device="png", dpi=600, bg = "white")
+```
+
+
+## Simulation analysis
+
+```{r load data}
+metadata_simulation <- read.csv("../data/simulated_data/metadata")
+
+filtered_counts_simulation_discovery <- read.csv("../data/filtered_data/filtered_sim_discovery.csv") %>% 
+  column_to_rownames(var="GeneID")
+
+metadata_simulation_discovery <- metadata_simulation %>% 
+  filter(SampleID %in% colnames(filtered_counts_simulation_discovery)) %>%
+  mutate(group = as.factor(group)) %>%
+  mutate(group = relevel(group, ref = "condition"))
+```
+
+```{r}
+# correction and normalization using Limma approach
+design_correction <- model.matrix(~ 0 + group, data = metadata_simulation_discovery)
+colnames(design_correction) <- c("Groupcondition","Groupcontrol")
+
+# specify contrast
+contr_matrix <- makeContrasts(CancervsControl = Groupcondition -Groupcontrol, 
+                              levels = colnames(design_correction))
+counts_matrix = as.matrix(filtered_counts_simulation_discovery)
+dge_dataset = DGEList(counts_matrix,
+                      group = factor(metadata_simulation_discovery$group))
+dge_dataset = calcNormFactors(dge_dataset, 
+                              method="TMM")
+
+# compute cpm to TMM normalization (out of Limma pipeline)
+# norm_cpm <- cpm(dge_dataset, log = TRUE)
+# norm_cpm_nobatch <- removeBatchEffect(cpm(dge_dataset, log=TRUE),
+#                                       design=design_correction)
+
+dge_dataset$counts = dge_dataset$counts[, match(as.character(metadata_simulation_discovery$SampleID), as.character(colnames(dge_dataset$counts)))]
+dge_dataset$samples = dge_dataset$samples[match(as.character(metadata_simulation_discovery$SampleID), as.character(rownames(dge_dataset$samples))),]
+
+# combine obs weigths with sample quality weights
+all_voom_1 = voomWithQualityWeights(
+    dge_dataset,
+    design_correction,
+    method = "genebygene",
+    maxiter = 100,
+    tol = 1e-6
+  )
+
+# fit the linear model
+fit = lmFit(all_voom_1,
+            design_correction)
+vfit <- contrasts.fit(fit, contrasts=contr_matrix)
+
+# calculate moderated statistics
+fit <- eBayes(vfit, robust = TRUE)
+limma_plotsa_sim <- plotSA(fit, main="Final model: Mean-variance trend")
+ggsave("../results/Limma_SAplot_sim.png", plot = limma_plotsa_sim, device="png", dpi=600, bg = "white")
+
+# summary(decideTests(fit))
+
+# arrange results
+out <- topTable(fit, coef=1, sort.by="B", resort.by = "logFC", number = Inf, confint = TRUE) %>%
+  rownames_to_column(var = "gene")
+
+# set diffexpressed genes (pvalue < 0.05 and log2fc > 0.5 -in abs value-)
+out$diffexpressed <- "no"
+out$diffexpressed <- ifelse(out$adj.P.Val < 0.05 & (out$logFC > 0.5 | out$logFC < -0.5), "yes", "no")
+
+# save results
+write_csv(out, file = "../results/limma_results_sim_discovery.csv")
+
+# volcano plots with results
+plot_sim <- ggplot(data=out, aes(x=logFC, y=-log10(adj.P.Val), col=diffexpressed)) + 
+        geom_point(aes(alpha = diffexpressed), size = 2)  + 
+        theme_minimal() +
+        scale_color_manual(values=c("gray","#FF7829" )) +
+        scale_alpha_manual(values=c(0.6,0.3)) +
+        geom_vline(xintercept=c(-0.5, 0.5), col="black", lty = "dashed") +
+        geom_hline(yintercept=-log10(0.05), col="black", lty = "dashed") +
+        ggtitle("Limma in simulated data")
+
+ggsave("../results/Limma_plot_sim.png", plot = plot_sim, device="png", dpi=600, bg = "white", width = 13,
+  height = 10, units = "cm")
+```

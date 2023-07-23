@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='284.40pt' height='270.60pt' viewBox='0 0 284.40 270.60'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: none;'/>
+<defs>
+  <clipPath id='cpMC4wMHwyODQuNDB8MC4wMHwyNzAuNjA='>
+    <rect x='0.00' y='0.00' width='284.40' height='270.60' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHwyODQuNDB8MC4wMHwyNzAuNjA=)'>
+</g>
+<defs>
+  <clipPath id='cpMzcuNDR8MTgwLjU5fDUuNDh8MjM4Ljg5'>
+    <rect x='37.44' y='5.48' width='143.15' height='233.42' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzcuNDR8MTgwLjU5fDUuNDh8MjM4Ljg5)'>
+<polyline points='37.44,218.80 180.59,218.80 ' style='stroke-width: 0.53; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='37.44,152.07 180.59,152.07 ' style='stroke-width: 0.53; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='37.44,85.35 180.59,85.35 ' style='stroke-width: 0.53; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='37.44,18.63 180.59,18.63 ' style='stroke-width: 0.53; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='37.44,185.44 180.59,185.44 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='37.44,118.71 180.59,118.71 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='37.44,51.99 180.59,51.99 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='76.48,238.89 76.48,5.48 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='141.55,238.89 141.55,5.48 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
+<circle cx='140.42' cy='228.29' r='1.95' style='stroke-width: 0.71; stroke: #B0E0E6; fill: #B0E0E6;' />
+<circle cx='88.20' cy='81.01' r='1.95' style='stroke-width: 0.71; stroke: #FFC0A8; fill: #FFC0A8;' />
+<circle cx='85.71' cy='16.09' r='1.95' style='stroke-width: 0.71; stroke: #FFC0A8; fill: #FFC0A8;' />
+<circle cx='80.57' cy='53.52' r='1.95' style='stroke-width: 0.71; stroke: #FFC0A8; fill: #FFC0A8;' />
+<circle cx='73.09' cy='30.76' r='1.95' style='stroke-width: 0.71; stroke: #FFC0A8; fill: #FFC0A8;' />
+<circle cx='76.00' cy='52.59' r='1.95' style='stroke-width: 0.71; stroke: #FFC0A8; fill: #FFC0A8;' />
+<circle cx='141.26' cy='161.12' r='1.95' style='stroke-width: 0.71; stroke: #B0E0E6; fill: #B0E0E6;' />
+<circle cx='136.49' cy='218.82' r='1.95' style='stroke-width: 0.71; stroke: #B0E0E6; fill: #B0E0E6;' />
+<circle cx='143.97' cy='198.89' r='1.95' style='stroke-width: 0.71; stroke: #B0E0E6; fill: #B0E0E6;' />
+<circle cx='140.87' cy='165.20' r='1.95' style='stroke-width: 0.71; stroke: #B0E0E6; fill: #B0E0E6;' />
+</g>
+<g clip-path='url(#cpMC4wMHwyODQuNDB8MC4wMHwyNzAuNjA=)'>
+<text x='32.51' y='188.64' text-anchor='end' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Liberation Sans";'>0.0</text>
+<text x='32.51' y='121.92' text-anchor='end' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Liberation Sans";'>0.5</text>
+<text x='32.51' y='55.20' text-anchor='end' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Liberation Sans";'>1.0</text>
+<text x='76.48' y='250.24' text-anchor='middle' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Liberation Sans";'>Enfermedad</text>
+<text x='141.55' y='250.24' text-anchor='middle' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Liberation Sans";'>Control</text>
+<text x='109.02' y='262.83' text-anchor='middle' style='font-size: 11.00px; font-family: "Liberation Sans";'>Predicción</text>
+<text transform='translate(13.50,122.19) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: "Liberation Sans";'>Probabilidad de enfermedad</text>
+<text x='197.03' y='106.18' style='font-size: 11.00px; font-family: "Liberation Sans";'>group</text>
+<circle cx='205.67' cy='121.44' r='1.95' style='stroke-width: 0.71; stroke: #FFC0A8; fill: #FFC0A8;' />
+<circle cx='205.67' cy='138.72' r='1.95' style='stroke-width: 0.71; stroke: #B0E0E6; fill: #B0E0E6;' />
+<text x='219.79' y='124.65' style='font-size: 8.80px; font-family: "Liberation Sans";'>Enfermedad</text>
+<text x='219.79' y='141.93' style='font-size: 8.80px; font-family: "Liberation Sans";'>Control</text>
+</g>
+</svg>

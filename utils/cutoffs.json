@@ -1,0 +1,59 @@
+{
+  "QC" : [
+    {
+      "id":"InsertSize",
+      "description": "Computed with CollectInsertSizeMetrics, it's an inferred insert size based on the mapping location of the reads. ",
+      "software": "Picard",
+      "value": 131.45,
+      "isEssential": false
+    },
+    
+    {
+      "id":"RNA_degradation",
+      "description": "Assessed via 3' bias index, dividing the number of reads mapped to 3' exons by the number of reads mapped to all exons",
+      "software": "RseQC",
+      "value": 0.33,
+      "isEssential": true,
+      "reference": "Wenying P, Quake SR, Altman R, Blumenfeld Y, and Stevenson D. 2016. Development of Diagnostic Methods UsingCell-Free Nucleic Acids"
+    },
+    
+    {
+      "id":"DNA_contamination",
+      "description": "Assessed via intron-to-exon ratio, by dividing the number of reads mapped to all introns by the number of reads mapped to all exons",
+      "software": "RseQC",
+      "value": 0.51,
+      "isEssential": false,
+      "reference": "Wenying P, Quake SR, Altman R, Blumenfeld Y, and Stevenson D. 2016. Development of Diagnostic Methods UsingCell-Free Nucleic Acids"
+    },
+    
+    {
+      "id":"rRNA_fraction",
+      "description": "Computed comparing the reads that map to known ribosomal sequences with the total number of reads for a given sample, using the gtf annotation",
+      "value": 0.10,
+      "isEssential": true,
+      "reference": "Moufarrej, Mira N., Ronald J. Wong, Gary M. Shaw, David K. Stevenson, and Stephen R. Quake. 2020. Investigating Pregnancy and Its Complications Using Circulating Cell-Free RNA in Women’s Blood During Gestation. Frontiers in Pediatrics 8."
+    },
+    
+    {
+      "id":"Picard_duplicates",
+      "description": "Percentage of duplicates, computed using the MarkDuplicates function after q10 filter",
+      "software": "Picard",
+      "value": 0.84,
+      "isEssential": false
+    },
+    
+    {
+      "id":"Flagstat_duplicates",
+      "description": "Percentage of duplicates, computed dividing the difference between the properly paired reads before and after removing duplicates with MarkDuplicates by the total number of reads",
+      "value": 0.68,
+      "isEssential": false
+    },
+    
+    {
+      "id":"Effective_library",
+      "description": "Percentage of reads assigned without ambiguity to a genomic feature",
+      "value": 0.40,
+      "isEssential": true
+    }
+  ]
+}

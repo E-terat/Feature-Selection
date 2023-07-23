@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='284.40pt' height='270.60pt' viewBox='0 0 284.40 270.60'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: none;'/>
+<defs>
+  <clipPath id='cpMC4wMHwyODQuNDB8MC4wMHwyNzAuNjA='>
+    <rect x='0.00' y='0.00' width='284.40' height='270.60' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHwyODQuNDB8MC4wMHwyNzAuNjA=)'>
+</g>
+<defs>
+  <clipPath id='cpNTYuNjB8Mjc4LjkyfDQyLjAzfDIzNy43Ng=='>
+    <rect x='56.60' y='42.03' width='222.32' height='195.74' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTYuNjB8Mjc4LjkyfDQyLjAzfDIzNy43Ng==)'>
+<polyline points='91.97,237.76 91.97,42.03 ' style='stroke-width: 1.07; stroke: #E5E5E5; stroke-linecap: butt;' />
+<polyline points='142.50,237.76 142.50,42.03 ' style='stroke-width: 1.07; stroke: #E5E5E5; stroke-linecap: butt;' />
+<polyline points='193.03,237.76 193.03,42.03 ' style='stroke-width: 1.07; stroke: #E5E5E5; stroke-linecap: butt;' />
+<polyline points='243.55,237.76 243.55,42.03 ' style='stroke-width: 1.07; stroke: #E5E5E5; stroke-linecap: butt;' />
+<polyline points='66.71,237.76 66.71,42.03 ' style='stroke-width: 1.07; stroke: #E5E5E5; stroke-linecap: butt;' />
+<polyline points='117.23,237.76 117.23,42.03 ' style='stroke-width: 1.07; stroke: #E5E5E5; stroke-linecap: butt;' />
+<polyline points='167.76,237.76 167.76,42.03 ' style='stroke-width: 1.07; stroke: #E5E5E5; stroke-linecap: butt;' />
+<polyline points='218.29,237.76 218.29,42.03 ' style='stroke-width: 1.07; stroke: #E5E5E5; stroke-linecap: butt;' />
+<polyline points='268.82,237.76 268.82,42.03 ' style='stroke-width: 1.07; stroke: #E5E5E5; stroke-linecap: butt;' />
+<line x1='66.71' y1='237.76' x2='66.71' y2='42.03' style='stroke-width: 1.07; stroke: #4378BF; stroke-dasharray: 1.42,4.27; stroke-linecap: butt;' />
+<line x1='66.71' y1='177.54' x2='66.71' y2='177.54' style='stroke-width: 21.34; stroke: #4378BF; stroke-linecap: butt;' />
+<line x1='66.71' y1='215.18' x2='66.71' y2='215.18' style='stroke-width: 21.34; stroke: #4378BF; stroke-linecap: butt;' />
+<line x1='66.71' y1='139.90' x2='89.16' y2='139.90' style='stroke-width: 21.34; stroke: #4378BF; stroke-linecap: butt;' />
+<line x1='66.71' y1='102.25' x2='122.85' y2='102.25' style='stroke-width: 21.34; stroke: #4378BF; stroke-linecap: butt;' />
+<line x1='66.71' y1='64.61' x2='268.82' y2='64.61' style='stroke-width: 21.34; stroke: #4378BF; stroke-linecap: butt;' />
+</g>
+<g clip-path='url(#cpMC4wMHwyODQuNDB8MC4wMHwyNzAuNjA=)'>
+</g>
+<defs>
+  <clipPath id='cpNTYuNjB8Mjc4LjkyfDMwLjc4fDQyLjAz'>
+    <rect x='56.60' y='30.78' width='222.32' height='11.25' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTYuNjB8Mjc4LjkyfDMwLjc4fDQyLjAz)'>
+<text x='56.60' y='40.78' style='font-size: 12.00px;fill: #371EA3; font-family: "Liberation Sans";'>Logistic regression</text>
+</g>
+<g clip-path='url(#cpMC4wMHwyODQuNDB8MC4wMHwyNzAuNjA=)'>
+<text x='66.71' y='249.99' text-anchor='middle' style='font-size: 10.00px; font-family: "Liberation Sans";'>0.000</text>
+<text x='117.23' y='249.99' text-anchor='middle' style='font-size: 10.00px; font-family: "Liberation Sans";'>0.005</text>
+<text x='167.76' y='249.99' text-anchor='middle' style='font-size: 10.00px; font-family: "Liberation Sans";'>0.010</text>
+<text x='218.29' y='249.99' text-anchor='middle' style='font-size: 10.00px; font-family: "Liberation Sans";'>0.015</text>
+<text x='268.82' y='249.99' text-anchor='middle' style='font-size: 10.00px; font-family: "Liberation Sans";'>0.020</text>
+<text x='51.67' y='218.83' text-anchor='end' style='font-size: 10.00px; font-family: "Liberation Sans";'>CENPE</text>
+<text x='51.67' y='181.18' text-anchor='end' style='font-size: 10.00px; font-family: "Liberation Sans";'>NEK2</text>
+<text x='51.67' y='143.54' text-anchor='end' style='font-size: 10.00px; font-family: "Liberation Sans";'>ELL2</text>
+<text x='51.67' y='105.90' text-anchor='end' style='font-size: 10.00px; font-family: "Liberation Sans";'>KLK1</text>
+<text x='51.67' y='68.26' text-anchor='end' style='font-size: 10.00px; font-family: "Liberation Sans";'>CPOX</text>
+<text x='167.76' y='262.83' text-anchor='middle' style='font-size: 11.00px; font-family: "Liberation Sans";'>One minus AUC loss after permutations</text>
+<text x='56.60' y='18.81' style='font-size: 16.00px; font-family: "Liberation Sans";'>Feature Importance </text>
+</g>
+</svg>

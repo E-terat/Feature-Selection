@@ -1,0 +1,91 @@
+Set;SeqID;Age;Sex;Group;Stage;Etiology;Race
+Pilot;PP027;73;M;Liver Cancer;C;na;WHITE
+Pilot;PP099;72;M;Liver Cancer;B;Hemochromatosis,jaundice,Gilberts disease;WHITE
+Pilot;PP048;60;F;Liver Cancer;D;NASH;WHITE
+Pilot;PP026;65;M;Liver Cancer;A;NASH;OTHER
+Pilot;PP031;51;M;Liver Cancer;A;HCV+;WHITE
+Pilot;PP109;75;F;Liver Cancer;C;NASH,Cirrhosis;WHITE
+Pilot;PP050;82;F;Liver Cancer;A;NASH;WHITE
+Pilot;PP111;50;M;Liver Cancer;A;NASH;WHITE
+Pilot;PP078;59;F;Liver Cirrhosis;na;Cirrhosis secondary to sarcoidosis, HCV-/HBV-;WHITE
+Pilot;PP061;50;F;Liver Cirrhosis;na;HCV+,Hepatitis;WHITE
+Pilot;PP035;48;F;Liver Cirrhosis;na;Hepatitis;WHITE
+Pilot;PP075;33;M;Liver Cirrhosis;na;Budd Chiari;WHITE
+Pilot;PP073;66;M;Multiple Myeloma;I;na;WHITE
+Pilot;PP010;66;M;Multiple Myeloma;II;na;WHITE
+Pilot;PP008;70;F;Multiple Myeloma;II;na;WHITE
+Pilot;PP047;31;M;Multiple Myeloma;II;na;WHITE
+Pilot;PP015;66;F;Multiple Myeloma;III;na;WHITE
+Pilot;PP074;35;F;Multiple Myeloma;II;na;WHITE
+Pilot;PP098;55;M;Multiple Myeloma;II;na;WHITE
+Pilot;PP005;60;M;Multiple Myeloma;II;na;WHITE
+Pilot;PP007;50;F;Multiple Myeloma;I;na;WHITE
+Pilot;PP049;73;M;Multiple Myeloma;III;na;WHITE
+Pilot;PP097;64;F;MGUS;na;na;WHITE
+Pilot;PP018;73;M;MGUS;na;na;WHITE
+Pilot;PP060;68;M;MGUS;na;na;WHITE
+Pilot;PP036;57;M;MGUS;na;na;WHITE
+Pilot;PP114;70;F;MGUS;na;na;WHITE
+Pilot;PP103;56;F;MGUS;na;na;WHITE
+Pilot;PP058;67;M;MGUS;na;na;WHITE
+Pilot;PP017;64;M;MGUS;na;na;WHITE
+Pilot;PP102;47;M;Non-Cancer;na;na;WHITE
+Pilot;PP055;37;F;Non-Cancer;na;na;WHITE
+Pilot;PP019;59;F;Non-Cancer;na;na;WHITE
+Pilot;PP032;57;M;Non-Cancer;na;na;WHITE
+Pilot;PP062;71;F;Non-Cancer;na;na;WHITE
+Pilot;PP011;60;F;Non-Cancer;na;na;WHITE
+Pilot;PP041;64;F;Non-Cancer;na;na;WHITE
+Pilot;PP004;46;F;Non-Cancer;na;na;WHITE
+Pilot;PP003;42;M;Non-Cancer;na;na;ASIAN
+Pilot;PP105;43;F;Non-Cancer;na;na;WHITE
+Pilot;PP012;30;M;Non-Cancer;na;na;WHITE
+Pilot;PP046;53;F;Non-Cancer;na;na;WHITE
+Pilot;PP087;41;F;Non-Cancer;na;na;WHITE
+Pilot;PP016;66;F;Non-Cancer;na;na;WHITE
+Pilot;PP029;51;M;Non-Cancer;na;na;ASIAN
+Pilot;PP043;42;M;Non-Cancer;na;na;WHITE
+Pilot;PP020;60;F;Non-Cancer;na;na;WHITE
+Pilot;PP002;64;F;Non-Cancer;na;na;WHITE
+Pilot;PP116;60;M;Non-Cancer;na;na;WHITE
+Pilot;PP091;70;M;Non-Cancer;na;na;WHITE
+Validation;RSQ_072;76;F;Liver Cancer;A;HCV successfully treated;WHITE
+Validation;RSQ_066;72;F;Liver Cancer;B;HCV+;WHITE
+Validation;RSQ_054;81;F;Liver Cancer;B;HCV+;WHITE
+Validation;RSQ_060;69;M;Liver Cancer;A;HCV+;WHITE
+Validation;RSQ_076;61;M;Liver Cancer;B;HCV+;WHITE
+Validation;RSQ_078;67;M;Liver Cancer;A;HCV+;WHITE
+Validation;RSQ_069;62;M;Liver Cancer;B;HCV+;WHITE
+Validation;RSQ_049;67;M;Liver Cancer;A;HCV+;WHITE
+Validation;RSQ_055;64;F;Liver Cancer;B;Cirrhosis(HCV-, HBV-);WHITE
+Validation;RSQ_134;65;F;Liver Cancer;A;HCV+;WHITE
+Validation;RSQ_160b;71;M;Liver Cancer;B;HCV+;WHITE
+Validation;RSQ_135;47;M;Liver Cancer;B;HCV+;WHITE
+Validation;RSQ_171b;71;M;Liver Cancer;A;HCV+;WHITE
+Validation;RSQ_169b;66;M;Liver Cancer;A;HCV+;WHITE
+Validation;RSQ_138;78;F;Liver Cancer;B;not documented in EMR;WHITE
+Validation;RSQ_141;71;M;Liver Cancer;B;HCV+;WHITE
+Validation;RSQ_132;76;M;Liver Cancer;A;Hemochromatosis,jaundice,Gilbert disease;WHITE
+Validation;RSQ_188;82;M;Liver Cancer;C;Fatty Liver;WHITE
+Validation;RSQ_190;67;M;Liver Cancer;A;HCV+;WHITE
+Validation;RSQ_192;78;F;Liver Cancer;B;Alcoholic cirrhosis and steatoheaptitis;WHITE
+Validation;RSQ_177;68;M;Multiple Myeloma;I;na;WHITE
+Validation;RSQ_178;67;M;Multiple Myeloma;II;na;WHITE
+Validation;RSQ_179;63;F;Multiple Myeloma;II;na;WHITE
+Validation;RSQ_180;74;F;Multiple Myeloma;III;na;WHITE
+Validation;RSQ_181;63;M;Multiple Myeloma;I;na;WHITE
+Validation;RSQ_182;28;M;Multiple Myeloma;I;na;WHITE
+Validation;RSQ_183;60;F;Multiple Myeloma;III;na;WHITE
+Validation;RSQ_184;67;F;Multiple Myeloma;I;na;WHITE
+Validation;RSQ_041b;51;M;Multiple Myeloma;I;na;WHITE
+Validation;RSQ_067;72;M;Non-Cancer;na;na;WHITE
+Validation;RSQ_070;62;M;Non-Cancer;na;na;WHITE
+Validation;RSQ_077;64;F;Non-Cancer;na;na;WHITE
+Validation;RSQ_065;74;F;Non-Cancer;na;na;WHITE
+Validation;RSQ_073;25;F;Non-Cancer;na;na;WHITE
+Validation;RSQ_051;60;F;Non-Cancer;na;na;WHITE
+Validation;RSQ_074;54;F;Non-Cancer;na;na;WHITE
+Validation;RSQ_071;21;M;Non-Cancer;na;na;WHITE
+Validation;RSQ_068;64;F;Non-Cancer;na;na;WHITE
+Validation;RSQ_047;27;F;Non-Cancer;na;na;ASIAN
+

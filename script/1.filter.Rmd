@@ -1,0 +1,84 @@
+---
+title: "Filter datasets"
+author: "Esther Tercero Atencia"
+date: "2023-05-13"
+output: pdf_document
+---
+
+
+```{r, echo = F, include = F}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(tidyverse)
+library(edgeR)
+library(DESeq2)
+library(factoextra)
+library(ggplot2)
+library(ggpubr)
+library(here)
+source(here("utils/functions.R"))
+```
+
+In this document we will filter the count matrix of the MYELOMA MULTIPLE and SIMULATED dataset. The code for filter the HEPATOCELLULAR dataset is also included, but muted because it is not the main of the work.
+
+```{r load metadata}
+# metadata
+metadata <- utils::read.csv(here("data/metadata/all_metadata_prep.csv"))  %>%
+  mutate(sample = str_remove(sample, "b"), 
+         outcome = as.factor(outcome), 
+         age = as.numeric(age), 
+         gender = as.factor(gender),
+         RNA_extraction = as.factor(RNA_extraction),
+         Library_preparation = as.factor(Library_preparation), 
+         set = as.factor(set), 
+         race = as.factor(race),
+         group = as.factor(group)) 
+
+
+```
+
+Here the filter step is performed over the split dataset by cancer condition. 
+```{r}
+#-------- MM
+samples <- metadata %>% 
+  filter(outcome == "HD" | outcome == "MM") %>% 
+  select(sample) %>% 
+  as.vector()
+dedupCounts_mm <- read.csv(here("data/dedupCounts_data/dedupCounts_mm.csv")) %>% 
+  column_to_rownames("GeneID") 
+
+keep <- filter_expression(dedupCounts_mm)
+filtered_counts_mm <- dedupCounts_mm[keep,] %>% 
+  rownames_to_column(var = "GeneID")
+
+write_csv(filtered_counts_mm, file = here("data/filtered_data/filtered_dedupCounts_mm.csv"))
+
+#-------- HCC
+# samples <- metadata %>% 
+#   filter(outcome == "HD" | outcome == "HC") %>% 
+#   select(sample) %>% 
+#   as.vector()
+# 
+# dedupCounts_hc <- read.csv(here("data/dedupCounts_data/dedupCounts_hc.csv")) %>% 
+#   column_to_rownames("GeneID") 
+# 
+# keep <- filter_expression(dedupCounts_hc)
+# filtered_counts_hc <- dedupCounts_hc[keep,] %>% 
+#   rownames_to_column(var = "GeneID")
+# write_csv(filtered_counts_hc, file = here("data/filtered_data/filtered_dedupCounts_hc.csv"))
+
+```
+
+## Simulated data
+
+```{r}
+sim_counts <- utils::read.csv(here("data/simulated_data/sim_counts_rep")) %>% 
+  column_to_rownames(var = "GeneID")
+sim_metadata <- utils::read.csv(here("data/simulated_data/metadata_rep"))
+
+keep <- filter_expression(sim_counts)
+sim_filtered <- sim_counts[keep,] %>% 
+  rownames_to_column(var = "GeneID")
+
+write_csv(sim_filtered, file = here("data/filtered_data/filtered_dedupCounts_sim_rep.csv"))
+```
+

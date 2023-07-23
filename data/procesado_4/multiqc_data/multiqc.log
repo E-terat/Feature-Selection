@@ -1,0 +1,45 @@
+[2023-02-11 23:27:15,684] multiqc                                            [DEBUG  ]  This is MultiQC v1.13
+[2023-02-11 23:27:15,688] multiqc                                            [DEBUG  ]  Command used: /mnt/efs/clusterfcs/apps/conda/envs/iperez-cfRNAseq/bin/multiqc --force --outdir /mnt/efs/clusterfcs/data/tfm-esther/results/procesado-4 /mnt/efs/clusterfcs/data/tfm-esther/results/procesado-4
+[2023-02-11 23:27:15,865] multiqc                                            [WARNING]  MultiQC Version v1.14 now available!
+[2023-02-11 23:27:15,865] multiqc                                            [DEBUG  ]  Working dir : /mnt/efs/clusterfcs/scripts/tfm-esther
+[2023-02-11 23:27:15,865] multiqc                                            [DEBUG  ]  Template    : default
+[2023-02-11 23:27:15,865] multiqc                                            [DEBUG  ]  Running Python 3.8.13 (default, Oct 21 2022, 23:50:54)  [GCC 11.2.0]
+[2023-02-11 23:27:15,866] multiqc                                            [DEBUG  ]  Analysing modules: custom_content, ccs, ngsderive, purple, conpair, lima, peddy, somalier, methylQA, mosdepth, phantompeakqualtools, qualimap, preseq, quast, qorts, rna_seqc, rockhopper, rsem, rseqc, busco, bustools, goleft_indexcov, gffcompare, disambiguate, supernova, deeptools, sargasso, verifybamid, mirtrace, happy, mirtop, sambamba, homer, hops, macs2, theta2, snpeff, gatk, htseq, bcftools, featureCounts, fgbio, dragen, dedup, pbmarkdup, damageprofiler, biobambam2, jcvi, mtnucratio, picard, vep, sentieon, prokka, qc3C, nanostat, samblaster, samtools, sexdeterrmine, eigenstratdatabasetools, bamtools, jellyfish, vcftools, longranger, stacks, varscan2, snippy, bbmap, bismark, biscuit, hicexplorer, hicup, hicpro, salmon, kallisto, slamdunk, star, hisat2, tophat, bowtie2, bowtie1, snpsplit, odgi, pangolin, kat, leehom, adapterRemoval, clipandmerge, cutadapt, flexbar, kaiju, kraken, malt, trimmomatic, sickle, skewer, sortmerna, biobloomtools, fastq_screen, afterqc, fastp, fastqc, pychopper, pycoqc, minionqc, multivcfanalyzer, clusterflow, checkqc, bcl2fastq, bclconvert, interop, ivar, flash, seqyclean, optitype, whatshap
+[2023-02-11 23:27:15,866] multiqc                                            [DEBUG  ]  Using temporary directory for creating report: /tmp/tmp_txb4wp8
+[2023-02-11 23:27:16,118] multiqc                                            [INFO   ]  Search path : /mnt/efs/clusterfcs/data/tfm-esther/results/procesado-4
+[2023-02-11 23:29:56,519] multiqc                                            [DEBUG  ]  Summary of files that were skipped by the search: [skipped_module_specific_max_filesize: 2071] // [skipped_no_match: 445] // [skipped_ignore_pattern: 240] // [skipped_filesize_limit: 40]
+[2023-02-11 23:29:57,906] multiqc.plots.bargraph                             [DEBUG  ]  Using matplotlib version 3.1.3
+[2023-02-11 23:29:57,912] multiqc.plots.linegraph                            [DEBUG  ]  Using matplotlib version 3.1.3
+[2023-02-11 23:29:57,925] multiqc                                            [DEBUG  ]  No samples found: custom_content
+[2023-02-11 23:29:57,984] multiqc.modules.rseqc.rseqc                        [INFO   ]  Found 20 read_distribution reports
+[2023-02-11 23:29:58,114] multiqc.modules.featureCounts.feature_counts       [INFO   ]  Found 40 reports
+[2023-02-11 23:29:58,986] multiqc.modules.picard.picard                      [INFO   ]  Found 20 InsertSizeMetrics reports
+[2023-02-11 23:29:59,030] multiqc.modules.picard.MarkDuplicates              [DEBUG  ]  Duplicate sample name found in RSQ_074_sorted_q10_mrkDup_dupMetrics.txt! Overwriting: RSQ_074_sorted_q10
+[2023-02-11 23:29:59,031] multiqc.modules.picard.MarkDuplicates              [DEBUG  ]  Duplicate sample name found in RSQ_171b_sorted_q10_mrkDup_dupMetrics.txt! Overwriting: RSQ_171b_sorted_q10
+[2023-02-11 23:29:59,032] multiqc.modules.picard.MarkDuplicates              [DEBUG  ]  Duplicate sample name found in RSQ_069_sorted_q10_mrkDup_dupMetrics.txt! Overwriting: RSQ_069_sorted_q10
+[2023-02-11 23:29:59,033] multiqc.modules.picard.MarkDuplicates              [DEBUG  ]  Duplicate sample name found in RSQ_078_sorted_q10_mrkDup_dupMetrics.txt! Overwriting: RSQ_078_sorted_q10
+[2023-02-11 23:29:59,035] multiqc.modules.picard.MarkDuplicates              [DEBUG  ]  Duplicate sample name found in RSQ_177_sorted_q10_mrkDup_dupMetrics.txt! Overwriting: RSQ_177_sorted_q10
+[2023-02-11 23:29:59,036] multiqc.modules.picard.MarkDuplicates              [DEBUG  ]  Duplicate sample name found in RSQ_070_sorted_q10_mrkDup_dupMetrics.txt! Overwriting: RSQ_070_sorted_q10
+[2023-02-11 23:29:59,037] multiqc.modules.picard.MarkDuplicates              [DEBUG  ]  Duplicate sample name found in RSQ_067_sorted_q10_mrkDup_dupMetrics.txt! Overwriting: RSQ_067_sorted_q10
+[2023-02-11 23:29:59,038] multiqc.modules.picard.MarkDuplicates              [DEBUG  ]  Duplicate sample name found in RSQ_076_sorted_q10_mrkDup_dupMetrics.txt! Overwriting: RSQ_076_sorted_q10
+[2023-02-11 23:29:59,039] multiqc.modules.picard.MarkDuplicates              [DEBUG  ]  Duplicate sample name found in RSQ_135_sorted_q10_mrkDup_dupMetrics.txt! Overwriting: RSQ_135_sorted_q10
+[2023-02-11 23:29:59,041] multiqc.modules.picard.MarkDuplicates              [DEBUG  ]  Duplicate sample name found in RSQ_072_sorted_q10_mrkDup_dupMetrics.txt! Overwriting: RSQ_072_sorted_q10
+[2023-02-11 23:29:59,042] multiqc.modules.picard.MarkDuplicates              [DEBUG  ]  Duplicate sample name found in RSQ_160b_sorted_q10_mrkDup_dupMetrics.txt! Overwriting: RSQ_160b_sorted_q10
+[2023-02-11 23:29:59,043] multiqc.modules.picard.MarkDuplicates              [DEBUG  ]  Duplicate sample name found in RSQ_138_sorted_q10_mrkDup_dupMetrics.txt! Overwriting: RSQ_138_sorted_q10
+[2023-02-11 23:29:59,044] multiqc.modules.picard.MarkDuplicates              [DEBUG  ]  Duplicate sample name found in RSQ_071_sorted_q10_mrkDup_dupMetrics.txt! Overwriting: RSQ_071_sorted_q10
+[2023-02-11 23:29:59,046] multiqc.modules.picard.MarkDuplicates              [DEBUG  ]  Duplicate sample name found in RSQ_134_sorted_q10_mrkDup_dupMetrics.txt! Overwriting: RSQ_134_sorted_q10
+[2023-02-11 23:29:59,047] multiqc.modules.picard.MarkDuplicates              [DEBUG  ]  Duplicate sample name found in RSQ_077_sorted_q10_mrkDup_dupMetrics.txt! Overwriting: RSQ_077_sorted_q10
+[2023-02-11 23:29:59,048] multiqc.modules.picard.MarkDuplicates              [DEBUG  ]  Duplicate sample name found in RSQ_068_sorted_q10_mrkDup_dupMetrics.txt! Overwriting: RSQ_068_sorted_q10
+[2023-02-11 23:29:59,049] multiqc.modules.picard.MarkDuplicates              [DEBUG  ]  Duplicate sample name found in RSQ_141_sorted_q10_mrkDup_dupMetrics.txt! Overwriting: RSQ_141_sorted_q10
+[2023-02-11 23:29:59,050] multiqc.modules.picard.MarkDuplicates              [DEBUG  ]  Duplicate sample name found in RSQ_132_sorted_q10_mrkDup_dupMetrics.txt! Overwriting: RSQ_132_sorted_q10
+[2023-02-11 23:29:59,052] multiqc.modules.picard.MarkDuplicates              [DEBUG  ]  Duplicate sample name found in RSQ_169b_sorted_q10_mrkDup_dupMetrics.txt! Overwriting: RSQ_169b_sorted_q10
+[2023-02-11 23:29:59,053] multiqc.modules.picard.MarkDuplicates              [DEBUG  ]  Duplicate sample name found in RSQ_073_sorted_q10_mrkDup_dupMetrics.txt! Overwriting: RSQ_073_sorted_q10
+[2023-02-11 23:29:59,057] multiqc.modules.picard.picard                      [INFO   ]  Found 40 MarkDuplicates reports
+[2023-02-11 23:29:59,296] multiqc.modules.samtools.samtools                  [INFO   ]  Found 80 flagstat reports
+[2023-02-11 23:29:59,398] multiqc.modules.star.star                          [INFO   ]  Found 40 reports
+[2023-02-11 23:30:03,277] multiqc.modules.fastqc.fastqc                      [INFO   ]  Found 40 reports
+[2023-02-11 23:30:04,068] multiqc                                            [INFO   ]  Compressing plot data
+[2023-02-11 23:30:05,027] multiqc                                            [INFO   ]  Report      : ../../data/tfm-esther/results/procesado-4/multiqc_report.html
+[2023-02-11 23:30:05,027] multiqc                                            [INFO   ]  Data        : ../../data/tfm-esther/results/procesado-4/multiqc_data
+[2023-02-11 23:30:05,027] multiqc                                            [DEBUG  ]  Moving data file from '/tmp/tmp_txb4wp8/multiqc_data' to '/mnt/efs/clusterfcs/data/tfm-esther/results/procesado-4/multiqc_data'
+[2023-02-11 23:30:05,553] multiqc                                            [INFO   ]  MultiQC complete
