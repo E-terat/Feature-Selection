@@ -18,7 +18,7 @@ library(limma)
 source("../utils/functions.R")
 ```
 
-In this file we include the code necessary to perform DEA using Limma approach. Data loading is also available.
+In this file we include the code necessary to perform DEA using limma approach. Data loading is also available.
 
 ## Data loading
 
@@ -55,7 +55,7 @@ design_correction <- model.matrix(~ 0 + group + gender + age_fact + Library_prep
 colnames(design_correction) <- make.names(colnames(design_correction))
 
 # specify contrast  
-contr_matrix <- makeContrasts(CancervsControl = groupMultiple.Myeloma - groupNon.Cancer, 
+contr_matrix <- makeContrasts(CancervsControl =  groupNon.Cancer-groupMultiple.Myeloma, 
                               levels = colnames(design_correction))
 counts_matrix = as.matrix(filtered_counts_mm_discovery)
 dge_dataset = DGEList(counts_matrix, group = factor(metadata_mm_disco$outcome))
