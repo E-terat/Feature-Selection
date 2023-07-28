@@ -55,7 +55,7 @@ design_correction <- model.matrix(~ 0 + group + gender + age_fact + Library_prep
 colnames(design_correction) <- make.names(colnames(design_correction))
 
 # specify contrast  
-contr_matrix <- makeContrasts(CancervsControl =  groupNon.Cancer-groupMultiple.Myeloma, 
+contr_matrix <- makeContrasts(CancervsControl = groupMultiple.Myeloma - groupNon.Cancer, 
                               levels = colnames(design_correction))
 counts_matrix = as.matrix(filtered_counts_mm_discovery)
 dge_dataset = DGEList(counts_matrix, group = factor(metadata_mm_disco$outcome))

@@ -51,6 +51,7 @@ metadata_mm_disco <- metadata %>%
 
 ```{r}
 # correction and normalization using DESeq2 approach
+metadata_mm_disco$group <- relevel(metadata_mm_disco$group, ref = "Non-Cancer")
 design_all <- model.matrix(~ group + gender + age_fact + Library_preparation, data = metadata_mm_disco) 
 colnames(design_all) <- make.names(colnames(design_all))
 
@@ -60,15 +61,17 @@ des_batchremoval <- DESeqDataSetFromMatrix(
   design  = design_all    #model matrix 
 )
 
+
+
 dataset_batchremoval <- DESeq(des_batchremoval)
-results_mm_disco <- results(dataset_batchremoval, cooksCutoff =  F, name = "groupNon.Cancer")
+results_mm_disco <- results(dataset_batchremoval, cooksCutoff =  F, name = "groupMultiple.Myeloma")
 
 # compute shrunken log2FC
 lfc_se_batch <- lfcShrink(
   dataset_batchremoval,
   type = "apeglm",
   res = results_mm_disco,
-  coef = "groupNon.Cancer",
+  coef = "groupMultiple.Myeloma",
   apeAdapt = F)
 ### resultsNames(dataset_batchremoval)
 
